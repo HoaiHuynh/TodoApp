@@ -5,7 +5,8 @@ import { integer, sqliteTable, text, } from "drizzle-orm/sqlite-core";
 export const todos = sqliteTable("todos", {
     id: integer("id").primaryKey(),
     title: text("title"),
-    completed: integer("completed"),
+    description: text("description"),
+    complete: integer("complete"),
     priority: integer("priority"),
     label: text("label"),
     schedule: text("schedule"),

@@ -95,8 +95,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "completed": {
-          "name": "completed",
+        "complete": {
+          "name": "complete",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,

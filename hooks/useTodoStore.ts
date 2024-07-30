@@ -10,6 +10,15 @@ type searchStore = {
     }
 }
 
+const DEFAULT_TODO = {
+    title: undefined,
+    description: undefined,
+    priority: undefined,
+    label: undefined,
+    schedule: undefined,
+    complete: false
+}
+
 const useSearchStore = create<searchStore>((set) => ({
     searchText: '',
     actions: {
@@ -24,6 +33,7 @@ type TodoStore = {
     todos: SelectTodo[];
     actions: {
         refetchTodos: () => void;
+        getTodo: (id: string) => SelectTodo | undefined;
     }
 }
 
@@ -34,14 +44,16 @@ const useTodoStore = create<TodoStore>((set) => {
         return {
             todos: fetchTodos.all(),
             actions: {
-                refetchTodos: () => set({ todos: fetchTodos.all() })
+                refetchTodos: () => set({ todos: fetchTodos.all() }),
+                getTodo: (id) => fetchTodos.where(eq(todos.id, Number(id))).get()
             }
         }
     } catch (error) {
         return {
             todos: [],
             actions: {
-                refetchTodos: () => set({ todos: fetchTodos.all() })
+                refetchTodos: () => set({ todos: fetchTodos.all() }),
+                getTodo: (id) => fetchTodos.where(eq(todos.id, Number(id))).get()
             }
         }
     }
@@ -50,43 +62,48 @@ const useTodoStore = create<TodoStore>((set) => {
 export const useTodos = () => useTodoStore((state) => state.todos);
 export const useTodoActions = () => useTodoStore((state) => state.actions);
 
+export const useTodo = (id?: string) => {
+    if (!id) return DEFAULT_TODO;
+
+    const todo = db.select().from(todos).where(eq(todos.id, Number(id))).get();
+
+    return todo;
+}
+
 export type EditTodoModel = {
     title?: string;
+    description?: string;
     priority?: string;
     label?: string;
     schedule?: string;
-    completed?: boolean
+    complete?: boolean
 };
 
 type EditTodoStore = {
     todo: EditTodoModel;
     actions: {
         onChangeTitle: (title: string) => void;
+        onChangeDescription: (description: string) => void;
         onChangePriority: (priority: string) => void;
         onChangeLabel: (label: string) => void;
         onChangeSchedule: (schedule: string) => void;
-        toggleComplete: (completed: boolean) => void;
-        saveTodo: (id: string) => void;
+        toggleComplete: (complete: boolean) => void;
+        saveTodo: (id?: string) => void;
         deleteTodo: (id: string) => void;
     }
 }
 
 const useEditTodoStore = create<EditTodoStore>((set, get) => ({
-    todo: {
-        title: '',
-        priority: '',
-        label: '',
-        schedule: '',
-        completed: false
-    },
+    todo: DEFAULT_TODO,
     actions: {
         onChangeTitle: (title) => set((state) => ({ todo: { ...state.todo, title } })),
+        onChangeDescription: (description) => set((state) => ({ todo: { ...state.todo, description } })),
         onChangePriority: (priority) => set((state) => ({ todo: { ...state.todo, priority } })),
         onChangeLabel: (label) => set((state) => ({ todo: { ...state.todo, label } })),
         onChangeSchedule: (schedule) => set((state) => ({ todo: { ...state.todo, schedule } })),
-        toggleComplete: (completed) => set((state) => ({ todo: { ...state.todo, completed } })),
+        toggleComplete: (complete) => set((state) => ({ todo: { ...state.todo, complete } })),
         saveTodo: (id) => {
-            const { title, priority, label, schedule, completed } = get().todo;
+            const { title, description, priority, label, schedule, complete } = get().todo;
 
             if (!title) {
                 return;
@@ -96,26 +113,28 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
                 .values({
                     id: Number(id),
                     title,
+                    description,
                     priority: Number(priority),
                     label,
                     schedule,
-                    completed: completed ? 1 : 0,
+                    complete: complete ? 1 : 0,
                     createdAt: new Date().toISOString(),
                 })
                 .onConflictDoUpdate({
                     target: todos.id,
                     set: {
                         title,
+                        description,
                         priority: Number(priority),
                         label,
                         schedule,
-                        completed: completed ? 1 : 0,
+                        complete: complete ? 1 : 0,
                         updatedAt: new Date().toISOString()
                     }
                 })
-                .run()
+                .run();
 
-            set({ todo: { title: '', priority: '', label: '', schedule: '', completed: false } });
+            set({ todo: DEFAULT_TODO });
 
             useTodoStore.getState().actions.refetchTodos();
         },
@@ -124,7 +143,7 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
                 .where(eq(todos.id, Number(id)))
                 .run();
 
-            useTodoStore.getState().actions.refetchTodos()
+            useTodoStore.getState().actions.refetchTodos();
         }
     }
 }));

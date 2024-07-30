@@ -15,7 +15,7 @@ CREATE TABLE `priorities` (
 CREATE TABLE `todos` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`title` text,
-	`completed` integer,
+	`complete` integer,
 	`priority` integer,
 	`label` text,
 	`schedule` text,

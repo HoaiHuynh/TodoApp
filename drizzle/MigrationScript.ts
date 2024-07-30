@@ -14,7 +14,7 @@ async function migrateDbIfNeeded(db: SQLiteDatabase) {
     if (currentDbVersion === 0) {
         await db.execAsync(`
             PRAGMA journal_mode = 'wal';
-            CREATE TABLE todos (id INTEGER PRIMARY KEY NOT NULL, title TEXT NOT NULL, complete INTEGER, priority INTEGER, label TEXT, schedule TEXT, updated_at TEXT);
+            CREATE TABLE todos (id INTEGER PRIMARY KEY NOT NULL, title TEXT NOT NULL, description TEXT, complete INTEGER, priority INTEGER, label TEXT, schedule TEXT, created_at TEXT NOT NULL, updated_at TEXT);
         `);
 
         await db.execAsync(`
