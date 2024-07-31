@@ -1,31 +1,27 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { format, isSameDay } from 'date-fns';
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
-import DateTimePicker, { DateTimePickerRef } from './DateTimePicker';
-import { dateOptions } from '@/constants/AppConstants';
+import { priorityOptions } from '@/constants/AppConstants';
 
-interface SchedulePickerModalProps {
-    value?: Date;
-    mode?: 'date' | 'time' | 'datetime';
-    onChangeDate?: (date: Date | null | undefined) => void;
+interface PriorityPickerModalProps {
+    value?: string;
+    onChangePriority?: (value: string | null | undefined) => void;
     onClose?: () => void;
 }
 
-export interface SchedulePickerModalRef {
+export interface PriorityPickerModalRef {
     show: () => void;
     hide: () => void;
 }
 
-const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerModalProps>((props, ref) => {
-    const { mode, value, onChangeDate, onClose } = props;
+const PriorityPickerModal = forwardRef<PriorityPickerModalRef, PriorityPickerModalProps>((props, ref) => {
+    const { value, onChangePriority, onClose } = props;
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    const refDateTimePicker = useRef<DateTimePickerRef>(null);
-    const snapPoints = useRef(['25%', '50%', '85%']).current;
+    const snapPoints = useRef(['35%', '85%']).current;
 
-    const [selectedDate, setSelectedDate] = React.useState<Date | null | undefined>(value);
+    const [selectedPriority, setSelectedPriority] = React.useState<string | null | undefined>(value);
 
     useImperativeHandle(ref, () => ({
         show: () => openModal(),
@@ -41,20 +37,20 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
         onClose?.();
     };
 
-    const handleSelectDate = (date: Date | null | undefined) => {
-        setSelectedDate(date);
-        onChangeDate?.(date);
+    const handleSelect = (value: string | null | undefined) => {
+        setSelectedPriority(value);
+        onChangePriority?.(value);
     };
 
     const renderBody = () => {
         return (
             <View>
-                {dateOptions.map((option, index) => (
+                {priorityOptions.map((option, index) => (
                     <TouchableOpacity
                         key={index}
-                        onPress={() => handleSelectDate(option.value)}>
+                        onPress={() => handleSelect(option.value)}>
                         <View className="flex flex-row h-12 items-center mx-2">
-                            {selectedDate && option?.value && isSameDay(selectedDate, option?.value) && (
+                            {selectedPriority === option?.value && (
                                 <Ionicons
                                     name={'checkmark-circle'}
                                     size={24}
@@ -71,32 +67,12 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
 
                             {option?.value && (
                                 <Text className="text-gray-400">
-                                    {format(option?.value, 'EEE')}
+                                    {option?.value}
                                 </Text>
                             )}
-
-
                         </View>
                     </TouchableOpacity>
                 ))}
-
-                <TouchableOpacity onPress={() => refDateTimePicker?.current?.show()}>
-                    <View className="flex flex-row h-12 items-center mx-2">
-                        <View className="flex flex-1 flex-row gap-x-2 items-center">
-                            <Ionicons
-                                name={'calendar-number-outline'}
-                                size={24}
-                                color="#3b82f6" />
-                            <Text className="text-base font-semibold">Choose date</Text>
-                        </View>
-
-                        {selectedDate && (
-                            <Text className="text-gray-400">
-                                {format(selectedDate, 'dd/MM/yyyy')}
-                            </Text>
-                        )}
-                    </View>
-                </TouchableOpacity>
             </View>
         );
     };
@@ -104,7 +80,7 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
     return (
         <View className="flex flex-1">
             <BottomSheetModal
-                index={1}
+                index={0}
                 ref={bottomSheetModalRef}
                 snapPoints={snapPoints}>
                 <BottomSheetView className="flex flex-1 px-4">
@@ -115,7 +91,7 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
                             <Text className="text-red-400">Close</Text>
                         </TouchableOpacity>
 
-                        <Text className="text-lg font-semibold">Select Date</Text>
+                        <Text className="text-lg font-semibold">Priority</Text>
 
                         <TouchableOpacity
                             className="h-10 items-center justify-center rounded-full"
@@ -127,11 +103,10 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
                     {renderBody()}
                 </BottomSheetView>
             </BottomSheetModal>
-            <DateTimePicker ref={refDateTimePicker} mode={mode} onChangeDate={handleSelectDate} />
         </View>
     );
 });
 
-SchedulePickerModal.displayName = 'SchedulePickerModal';
+PriorityPickerModal.displayName = 'PriorityPickerModal';
 
-export default SchedulePickerModal;
+export default PriorityPickerModal;

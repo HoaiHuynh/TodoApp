@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import { themes } from '../utils/ColorTheme';
 import { ThemeType } from '@/types/type';
@@ -18,7 +18,6 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     return (
         <ThemeContext.Provider value={{ theme: colorScheme }}>
             <View style={themes[colorScheme]} className="flex-1">
-                <Text className='text-primary-default'>Theme provider</Text>
                 {children}
             </View>
         </ThemeContext.Provider>

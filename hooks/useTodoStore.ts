@@ -82,8 +82,6 @@ export type EditTodoModel = {
 type EditTodoStore = {
     todo: EditTodoModel;
     actions: {
-        onChangeTitle: (id: string | null | undefined, title: string) => void;
-        onChangeDescription: (id: string | null | undefined, description: string) => void;
         onChangePriority: (id: string | null | undefined, priority: string) => void;
         onChangeLabel: (id: string | null | undefined, label: string) => void;
         onChangeSchedule: (id: string | null | undefined, schedule: string) => void;
@@ -96,30 +94,30 @@ type EditTodoStore = {
 const useEditTodoStore = create<EditTodoStore>((set, get) => ({
     todo: DEFAULT_TODO,
     actions: {
-        onChangeTitle: (id, title) => {
-            if (id) {
-                db.update(todos)
-                    .set({ title })
-                    .where(eq(todos.id, Number(id)))
-                    .run();
+        // onChangeTitle: (id, title) => {
+        //     if (id) {
+        //         db.update(todos)
+        //             .set({ title })
+        //             .where(eq(todos.id, Number(id)))
+        //             .run();
 
-                useTodoStore.getState().actions.refetchTodos();
-            }
+        //         useTodoStore.getState().actions.refetchTodos();
+        //     }
 
-            set((state) => ({ todo: { ...state.todo, title } }));
-        },
-        onChangeDescription: (id, description) => {
-            if (id) {
-                db.update(todos)
-                    .set({ description })
-                    .where(eq(todos.id, Number(id)))
-                    .run();
+        //     set((state) => ({ todo: { ...state.todo, title } }));
+        // },
+        // onChangeDescription: (id, description) => {
+        //     if (id) {
+        //         db.update(todos)
+        //             .set({ description })
+        //             .where(eq(todos.id, Number(id)))
+        //             .run();
 
-                useTodoStore.getState().actions.refetchTodos();
-            }
+        //         useTodoStore.getState().actions.refetchTodos();
+        //     }
 
-            set((state) => ({ todo: { ...state.todo, description } }));
-        },
+        //     set((state) => ({ todo: { ...state.todo, description } }));
+        // },
         onChangePriority: (id, priority) => {
             if (id) {
                 db.update(todos)
