@@ -1,12 +1,12 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useEditTodo, useEditTodoActions, useTodo, useTodoActions } from '@/hooks/useTodoStore';
+import { useEditTodo, useEditTodoActions, useTodoActions } from '@/hooks/useTodoStore';
 import { SelectTodo } from '@/db/schema';
 import Checkbox from '../Checkbox';
-import DateTimePicker, { DateTimePickerRef } from '../DateTimePicker';
 import SchedulePickerModal, { SchedulePickerModalRef } from '../SchedulePickerModal';
+import { getId } from '@/utils/AppUtil';
 
 interface CreateUpdateTodoModalProps {
     onClose?: () => void;
@@ -58,7 +58,7 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
 
         setVisible(true);
         bottomSheetModalRef.current?.present();
-    }
+    };
 
     const closeModal = () => {
         bottomSheetModalRef.current?.dismiss();
@@ -77,6 +77,18 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
         hide: closeModal
     }));
 
+    const handleToggleComplete = (value: boolean) => {
+        toggleComplete(getId(todo?.id), value);
+    };
+
+    const handleChangeTitle = (value: string) => {
+        onChangeTitle(getId(todo?.id), value);
+    };
+
+    const handleChangeDescription = (value: string) => {
+        onChangeDescription(getId(todo?.id), value);
+    };
+
     const renderBody = () => {
         if (!visible) {
             return <></>;
@@ -85,23 +97,24 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
         return (
             <View>
                 <View className='flex flex-row items-center'>
-                    <Checkbox value={Boolean(todo?.complete)} onChange={toggleComplete} />
+                    <Checkbox value={Boolean(todo?.complete)} onChange={handleToggleComplete} />
                     <TextInput
                         defaultValue={todo?.title || ''}
                         value={title}
                         multiline
                         numberOfLines={3}
-                        onChangeText={onChangeTitle}
-                        placeholder='Title'
+                        onChangeText={handleChangeTitle}
+                        placeholder='e.g. Buy a new Macbook'
                         className="flex-1 text-3xl font-semibold max-h-20" />
                 </View>
-                {todo?.description && (
+
+                {todo?.description || !todo?.id && (
                     <View className='flex flex-row items-center gap-x-2'>
                         <Ionicons name='menu-outline' size={24} color='#687076' />
                         <TextInput
                             defaultValue={todo?.description || ''}
                             value={description}
-                            onChangeText={onChangeDescription}
+                            onChangeText={handleChangeDescription}
                             placeholder='Description'
                             placeholderTextColor={'gray'}
                             className="h-full max-h-20" />
@@ -126,7 +139,7 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
                 </TouchableOpacity>
             </View>
         );
-    }
+    };
 
     return (
         <View className='flex flex-1'>
@@ -150,7 +163,9 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
                 </BottomSheetView>
             </BottomSheetModal>
         </View>
-    )
+    );
 });
+
+CreateUpdateTodoModal.displayName = 'CreateUpdateTodoModal';
 
 export default CreateUpdateTodoModal;

@@ -1,4 +1,4 @@
-import { SQLiteDatabase } from "expo-sqlite";
+import { SQLiteDatabase } from 'expo-sqlite';
 
 async function migrateDbIfNeeded(db: SQLiteDatabase) {
     const DATABASE_VERSION = 1;

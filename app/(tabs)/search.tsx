@@ -1,5 +1,5 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import React from 'react';
+import { Text, View } from 'react-native';
 
 interface searchProps { }
 
@@ -9,7 +9,7 @@ const search = (props: searchProps) => {
         <View>
             <Text>search</Text>
         </View>
-    )
-}
+    );
+};
 
-export default search
+export default search;

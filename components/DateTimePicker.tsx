@@ -1,10 +1,9 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react'
-import { Text, View } from 'react-native'
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 interface DateTimePickerProps {
     value?: Date;
-    mode?: "date" | "time" | "datetime";
+    mode?: 'date' | 'time' | 'datetime';
     onChangeDate?: (date: Date) => void;
     onClose?: () => void;
 }
@@ -33,7 +32,7 @@ const DateTimePicker = forwardRef<DateTimePickerRef, DateTimePickerProps>((props
     };
 
     const handleConfirm = (date: Date) => {
-        console.warn("A date has been picked: ", date);
+        console.warn('A date has been picked: ', date);
         hideDatePicker();
     };
 
@@ -44,9 +43,9 @@ const DateTimePicker = forwardRef<DateTimePickerRef, DateTimePickerProps>((props
             date={value}
             onConfirm={handleConfirm}
             onCancel={hideDatePicker} />
-    )
+    );
 });
 
-DateTimePicker.displayName = 'DateTimePicker'
+DateTimePicker.displayName = 'DateTimePicker';
 
-export default DateTimePicker
+export default DateTimePicker;

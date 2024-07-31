@@ -1,7 +1,7 @@
-import { desc, eq } from "drizzle-orm";
-import { create } from "zustand";
-import { db } from "@/db/client";
-import { SelectTodo, todos } from "@/db/schema";
+import { desc, eq } from 'drizzle-orm';
+import { create } from 'zustand';
+import { db } from '@/db/client';
+import { SelectTodo, todos } from '@/db/schema';
 
 type searchStore = {
     searchText: string;
@@ -17,14 +17,14 @@ const DEFAULT_TODO = {
     label: undefined,
     schedule: undefined,
     complete: false
-}
+};
 
 const useSearchStore = create<searchStore>((set) => ({
     searchText: '',
     actions: {
         onChangeSearchText: (text) => set({ searchText: text })
     }
-}))
+}));
 
 export const useSearchText = () => useSearchStore((state) => state.searchText);
 export const useSearchActions = () => useSearchStore((state) => state.actions);
@@ -47,7 +47,7 @@ const useTodoStore = create<TodoStore>((set) => {
                 refetchTodos: () => set({ todos: fetchTodos.all() }),
                 getTodo: (id) => fetchTodos.where(eq(todos.id, Number(id))).get()
             }
-        }
+        };
     } catch (error) {
         return {
             todos: [],
@@ -55,9 +55,9 @@ const useTodoStore = create<TodoStore>((set) => {
                 refetchTodos: () => set({ todos: fetchTodos.all() }),
                 getTodo: (id) => fetchTodos.where(eq(todos.id, Number(id))).get()
             }
-        }
+        };
     }
-})
+});
 
 export const useTodos = () => useTodoStore((state) => state.todos);
 export const useTodoActions = () => useTodoStore((state) => state.actions);
@@ -68,7 +68,7 @@ export const useTodo = (id?: string) => {
     const todo = db.select().from(todos).where(eq(todos.id, Number(id))).get();
 
     return todo;
-}
+};
 
 export type EditTodoModel = {
     title?: string;
@@ -82,26 +82,92 @@ export type EditTodoModel = {
 type EditTodoStore = {
     todo: EditTodoModel;
     actions: {
-        onChangeTitle: (title: string) => void;
-        onChangeDescription: (description: string) => void;
-        onChangePriority: (priority: string) => void;
-        onChangeLabel: (label: string) => void;
-        onChangeSchedule: (schedule: string) => void;
-        toggleComplete: (complete: boolean) => void;
-        saveTodo: (id?: string) => void;
-        deleteTodo: (id: string) => void;
+        onChangeTitle: (id: string | null | undefined, title: string) => void;
+        onChangeDescription: (id: string | null | undefined, description: string) => void;
+        onChangePriority: (id: string | null | undefined, priority: string) => void;
+        onChangeLabel: (id: string | null | undefined, label: string) => void;
+        onChangeSchedule: (id: string | null | undefined, schedule: string) => void;
+        toggleComplete: (id: string | null | undefined, complete: boolean) => void;
+        saveTodo: (id: string | null | undefined) => void;
+        deleteTodo: (id: string | null | undefined) => void;
     }
 }
 
 const useEditTodoStore = create<EditTodoStore>((set, get) => ({
     todo: DEFAULT_TODO,
     actions: {
-        onChangeTitle: (title) => set((state) => ({ todo: { ...state.todo, title } })),
-        onChangeDescription: (description) => set((state) => ({ todo: { ...state.todo, description } })),
-        onChangePriority: (priority) => set((state) => ({ todo: { ...state.todo, priority } })),
-        onChangeLabel: (label) => set((state) => ({ todo: { ...state.todo, label } })),
-        onChangeSchedule: (schedule) => set((state) => ({ todo: { ...state.todo, schedule } })),
-        toggleComplete: (complete) => set((state) => ({ todo: { ...state.todo, complete } })),
+        onChangeTitle: (id, title) => {
+            if (id) {
+                db.update(todos)
+                    .set({ title })
+                    .where(eq(todos.id, Number(id)))
+                    .run();
+
+                useTodoStore.getState().actions.refetchTodos();
+            }
+
+            set((state) => ({ todo: { ...state.todo, title } }));
+        },
+        onChangeDescription: (id, description) => {
+            if (id) {
+                db.update(todos)
+                    .set({ description })
+                    .where(eq(todos.id, Number(id)))
+                    .run();
+
+                useTodoStore.getState().actions.refetchTodos();
+            }
+
+            set((state) => ({ todo: { ...state.todo, description } }));
+        },
+        onChangePriority: (id, priority) => {
+            if (id) {
+                db.update(todos)
+                    .set({ priority: Number(priority) })
+                    .where(eq(todos.id, Number(id)))
+                    .run();
+
+                useTodoStore.getState().actions.refetchTodos();
+            }
+
+            set((state) => ({ todo: { ...state.todo, priority } }));
+        },
+        onChangeLabel: (id, label) => {
+            if (id) {
+                db.update(todos)
+                    .set({ label })
+                    .where(eq(todos.id, Number(id)))
+                    .run();
+
+                useTodoStore.getState().actions.refetchTodos();
+            }
+
+            set((state) => ({ todo: { ...state.todo, label } }));
+        },
+        onChangeSchedule: (id, schedule) => {
+            if (id) {
+                db.update(todos)
+                    .set({ schedule })
+                    .where(eq(todos.id, Number(id)))
+                    .run();
+
+                useTodoStore.getState().actions.refetchTodos();
+            }
+
+            set((state) => ({ todo: { ...state.todo, schedule } }));
+        },
+        toggleComplete: (id, complete) => {
+            if (id) {
+                db.update(todos)
+                    .set({ complete: complete ? 1 : 0 })
+                    .where(eq(todos.id, Number(id)))
+                    .run();
+
+                useTodoStore.getState().actions.refetchTodos();
+            }
+
+            set((state) => ({ todo: { ...state.todo, complete } }));
+        },
         saveTodo: (id) => {
             const { title, description, priority, label, schedule, complete } = get().todo;
 

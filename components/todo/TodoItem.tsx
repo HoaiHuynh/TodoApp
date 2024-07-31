@@ -1,5 +1,5 @@
-import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SelectTodo } from '@/db/schema';
 
 interface TodoItemProps {
@@ -13,7 +13,7 @@ const TodoItem = (props: TodoItemProps) => {
 
     const onPress = () => {
         props.onPress(item);
-    }
+    };
 
     return (
         <View className='flex flex-row h-20 w-full items-center'>
@@ -26,7 +26,7 @@ const TodoItem = (props: TodoItemProps) => {
                 <Text className='text-lg'>{item?.title}</Text>
             </TouchableOpacity>
         </View>
-    )
+    );
 };
 
 export default TodoItem;

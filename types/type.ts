@@ -4,3 +4,5 @@ export interface DateOption {
     icon: string;
     color: string;
 }
+
+export type ThemeType = 'light' | 'dark';

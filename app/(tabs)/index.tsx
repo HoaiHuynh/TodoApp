@@ -1,7 +1,7 @@
 import { FlatList, ListRenderItemInfo, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { format } from 'date-fns';
-import { useEditTodoActions, useTodos } from '@/hooks/useTodoStore';
+import { useTodos } from '@/hooks/useTodoStore';
 import { SelectTodo } from '@/db/schema';
 import TodoItem from '@/components/todo/TodoItem';
 import CreateUpdateTodoModal, { CreateUpdateTodoModalRef } from '@/components/todo/CreateUpdateTodoModal';
@@ -13,7 +13,6 @@ export default function HomeScreen() {
 
     const todos = useTodos();
     const today = format(new Date(), 'dd MMM');
-    const { saveTodo } = useEditTodoActions();
 
     const onEditTodo = (todo: SelectTodo) => {
         createUpdateTodoModalRef.current?.show(`${todo.id}`);

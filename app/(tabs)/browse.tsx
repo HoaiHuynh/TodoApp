@@ -1,5 +1,5 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import React from 'react';
+import { Text, View } from 'react-native';
 
 interface browseProps { }
 
@@ -9,7 +9,7 @@ const browse = (props: browseProps) => {
         <View>
             <Text>browse</Text>
         </View>
-    )
-}
+    );
+};
 
-export default browse
+export default browse;

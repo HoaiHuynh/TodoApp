@@ -1,5 +1,5 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import React from 'react';
+import { Text, View } from 'react-native';
 
 interface upcomingProps { }
 
@@ -9,7 +9,7 @@ const upcoming = (props: upcomingProps) => {
         <View>
             <Text>upcoming</Text>
         </View>
-    )
-}
+    );
+};
 
-export default upcoming
+export default upcoming;

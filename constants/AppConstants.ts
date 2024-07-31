@@ -1,5 +1,5 @@
-import { addDays, endOfWeek } from "date-fns";
-import { DateOption } from "@/types/type";
+import { addDays, endOfWeek } from 'date-fns';
+import { DateOption } from '@/types/type';
 
 export const dateOptions: DateOption[] = [
     { label: 'Today', value: new Date(), icon: 'calendar-clear-outline', color: '#16a34a' },
