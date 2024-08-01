@@ -31,8 +31,9 @@ export default function RootLayout() {
                         <Stack>
                             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                             <Stack.Screen name="+not-found" />
+                            <Stack.Screen name="focus" options={{ presentation: 'fullScreenModal', headerShown: false }} />
                         </Stack>
-                        <Toast />
+                        <Toast topOffset={60} />
                     </BottomSheetModalProvider>
                 </ThemeProvider>
             </GestureHandlerRootView>

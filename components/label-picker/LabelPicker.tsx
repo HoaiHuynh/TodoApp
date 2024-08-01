@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { LayoutChangeEvent, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { labelOptions } from '@/constants/AppConstants';
 import LabelPickerModal, { LabelPickerModalRef } from './LabelPickerModal';
@@ -15,6 +15,7 @@ const LabelPicker = (props: LabelPickerProps) => {
 
     const refLabel = useRef<LabelPickerModalRef>(null);
     const [selectedLabel, setSelectedLabel] = useState<ComboOptions[]>([]);
+    const [labelWidth, setLabelWidth] = useState(0);
 
     useEffect(() => {
         if (!value) {
@@ -38,6 +39,12 @@ const LabelPicker = (props: LabelPickerProps) => {
         onChangeLabel(selected.join(','));
     };
 
+    const onViewLayout = (event: LayoutChangeEvent) => {
+        if (labelWidth === 0) {
+            setLabelWidth(event.nativeEvent.layout.width);
+        }
+    };
+
     const renderValue = () => {
         if (!selectedLabel?.length) {
             return (
@@ -46,10 +53,10 @@ const LabelPicker = (props: LabelPickerProps) => {
         }
 
         return (
-            <View style={{ width: '100%', flexWrap: 'wrap', gap: 4, flex: 1, flexDirection: 'row' }}>
+            <View className='flex-wrap flex-row gap-2' style={{ width: labelWidth * 0.875 }}>
                 {selectedLabel?.map((item, index) => (
                     <View key={index} className='flex items-center justify-center px-2 py-1 rounded-md' style={{ backgroundColor: item?.backgroundColor }}>
-                        <Text className='text-base text-gray-800'>{item.label}</Text>
+                        <Text className='text-sm text-gray-800'>{item.label}</Text>
                     </View>
                 ))}
             </View>
@@ -58,7 +65,7 @@ const LabelPicker = (props: LabelPickerProps) => {
 
     return (
         <>
-            <View className='flex flex-row items-center gap-x-4 min-h-10 w-full'>
+            <View className='flex flex-row items-center gap-x-4 min-h-10 w-full' onLayout={onViewLayout}>
                 <Ionicons name='bookmarks-outline' size={22} color='#687076' />
                 <TouchableOpacity onPress={handleShow}>
                     {renderValue()}

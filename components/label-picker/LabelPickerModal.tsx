@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import { labelOptions } from '@/constants/AppConstants';
 import Checkbox from '../Checkbox';
@@ -21,7 +21,7 @@ const LabelPickerModal = forwardRef<LabelPickerModalRef, LabelPickerModalProps>(
     const { value, onChangeLabel, onClose } = props;
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    const snapPoints = useRef(['65%', '85%']).current;
+    const snapPoints = useRef(['65%', '90%']).current;
 
     const [selectedLabels, setSelectedLabels] = useState<Map<string, ComboOptions>>(new Map());
 
@@ -74,6 +74,10 @@ const LabelPickerModal = forwardRef<LabelPickerModalRef, LabelPickerModalProps>(
         setSelectedLabels(selected);
     };
 
+    const renderBackdrop = (backdropProps: BottomSheetBackdropProps) => (
+        <BottomSheetBackdrop {...backdropProps} pressBehavior={'close'} />
+    );
+
     const renderBody = () => {
         return (
             <View>
@@ -90,7 +94,7 @@ const LabelPickerModal = forwardRef<LabelPickerModalRef, LabelPickerModalProps>(
                                 <Text className="text-base font-semibold">{option.label}</Text>
                             </View>
 
-                            <Checkbox type='checkbox' value={selectedLabels?.has(option?.value)} />
+                            <Checkbox disabled type='checkbox' value={selectedLabels?.has(option?.value)} />
                         </View>
                     </TouchableOpacity>
                 ))}
@@ -103,7 +107,8 @@ const LabelPickerModal = forwardRef<LabelPickerModalRef, LabelPickerModalProps>(
             <BottomSheetModal
                 index={0}
                 ref={bottomSheetModalRef}
-                snapPoints={snapPoints}>
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}>
                 <BottomSheetView className="flex flex-1 px-4">
                     <View className="flex flex-row justify-between">
                         <TouchableOpacity
@@ -117,7 +122,7 @@ const LabelPickerModal = forwardRef<LabelPickerModalRef, LabelPickerModalProps>(
                         <TouchableOpacity
                             className="h-10 items-center justify-center rounded-full"
                             onPress={confirmSelect}>
-                            <Text className="text-blue-400">Done</Text>
+                            <Text className="text-blue-500">Done</Text>
                         </TouchableOpacity>
                     </View>
 

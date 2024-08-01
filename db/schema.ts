@@ -2,7 +2,7 @@ import { integer, sqliteTable, text, } from 'drizzle-orm/sqlite-core';
 
 //#region SCHEMA
 export const todos = sqliteTable('todos', {
-    id: integer('id').primaryKey(),
+    id: text('id').primaryKey(),
     title: text('title'),
     description: text('description'),
     complete: integer('complete'),
@@ -15,7 +15,7 @@ export const todos = sqliteTable('todos', {
 });
 
 export const priorities = sqliteTable('priorities', {
-    id: integer('id').primaryKey(),
+    id: text('id').primaryKey(),
     name: text('name'),
     color: text('color'),
     createdAt: text('created_at')
@@ -23,7 +23,7 @@ export const priorities = sqliteTable('priorities', {
 });
 
 export const labels = sqliteTable('labels', {
-    id: integer('id').primaryKey(),
+    id: text('id').primaryKey(),
     name: text('name'),
     color: text('color'),
     createdAt: text('created_at')

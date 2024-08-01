@@ -1,7 +1,7 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { format, isSameDay } from 'date-fns';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerRef } from '../DateTimePicker';
 import { dateOptions } from '@/constants/AppConstants';
@@ -24,7 +24,7 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const refDateTimePicker = useRef<DateTimePickerRef>(null);
-    const snapPoints = useRef(['25%', '50%', '85%']).current;
+    const snapPoints = useRef(['25%', '50%', '90%']).current;
 
     const [selectedDate, setSelectedDate] = React.useState<Date | null | undefined>(value);
 
@@ -51,6 +51,10 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
         setSelectedDate(date);
     };
 
+    const renderBackdrop = (backdropProps: BottomSheetBackdropProps) => (
+        <BottomSheetBackdrop {...backdropProps} pressBehavior={'close'} />
+    );
+
     const renderBody = () => {
         return (
             <View>
@@ -73,7 +77,7 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
                                 </Text>
                             )}
 
-                            <Checkbox value={(selectedDate && option?.value) ? isSameDay(selectedDate, option?.value) : false} />
+                            <Checkbox disabled value={(selectedDate && option?.value) ? isSameDay(selectedDate, option?.value) : false} />
                         </View>
                     </TouchableOpacity>
                 ))}
@@ -104,7 +108,8 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
             <BottomSheetModal
                 index={1}
                 ref={bottomSheetModalRef}
-                snapPoints={snapPoints}>
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}>
                 <BottomSheetView className="flex flex-1 px-4">
                     <View className="flex flex-row justify-between">
                         <TouchableOpacity
@@ -118,7 +123,7 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
                         <TouchableOpacity
                             className="h-10 items-center justify-center rounded-full"
                             onPress={confirmSelect}>
-                            <Text className="text-blue-400">Done</Text>
+                            <Text className="text-blue-500">Done</Text>
                         </TouchableOpacity>
                     </View>
 

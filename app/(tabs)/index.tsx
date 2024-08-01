@@ -1,34 +1,52 @@
 import React, { useRef } from 'react';
-import { FlatList, ListRenderItemInfo, View } from 'react-native';
+import { ListRenderItemInfo, RefreshControl, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { format } from 'date-fns';
-import { useEditTodoActions, useTodos } from '@/hooks/useTodoStore';
-import { SelectTodo } from '@/db/schema';
-import TodoItem from '@/components/todo/TodoItem';
+import Toast from 'react-native-toast-message';
+import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
+import { useEditTodoActions, useTodoActions, useTodos } from '@/hooks/useTodoStore';
 import CreateUpdateTodoModal, { CreateUpdateTodoModalRef } from '@/components/todo/CreateUpdateTodoModal';
+import { TodoDto } from '@/types/type';
+import SwipeableTodoItem from '@/components/todo/SwipeableTodoItem';
 
 export default function HomeScreen() {
     const createUpdateTodoModalRef = useRef<CreateUpdateTodoModalRef>(null);
 
     const todos = useTodos();
-    const { toggleComplete } = useEditTodoActions();
+    const { refetchTodos } = useTodoActions();
+    const { toggleComplete, deleteTodo } = useEditTodoActions();
     const today = format(new Date(), 'dd MMM');
 
-    const onEditTodo = (todo: SelectTodo) => {
+    const onEditTodo = (todo: TodoDto) => {
         createUpdateTodoModalRef.current?.show(`${todo.id}`);
     };
 
-    const handleToggleComplete = (id: number, complete: boolean) => {
-        toggleComplete(`${id}`, complete);
+    const handleToggleComplete = (id: string, complete: boolean) => {
+        toggleComplete(id, complete);
     };
 
-    const renderItem = ({ item, index }: ListRenderItemInfo<SelectTodo>) => {
+    const handleDeleteTodo = (id: string) => {
+        deleteTodo(id);
+
+        Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: 'Todo has been deleted'
+        });
+    };
+
+    const renderItem = ({ item, index }: ListRenderItemInfo<TodoDto>) => {
         return (
-            <TodoItem
-                item={item}
-                index={index}
-                onPress={onEditTodo}
-                onToggleComplete={handleToggleComplete} />
+            <Animated.View
+                entering={FadeInDown.delay(index * 100)}
+                exiting={FadeOutDown.delay(index * 100)}>
+                <SwipeableTodoItem
+                    item={item}
+                    index={index}
+                    onPress={onEditTodo}
+                    onDelete={handleDeleteTodo}
+                    onToggleComplete={handleToggleComplete} />
+            </Animated.View>
         );
     };
 
@@ -36,9 +54,12 @@ export default function HomeScreen() {
         <View className='flex flex-1'>
             <Stack.Screen options={{ headerLargeTitle: true, title: `Today, ${today}` }} />
 
-            <FlatList
+            <Animated.FlatList
                 data={todos}
                 renderItem={renderItem}
+                refreshControl={<RefreshControl
+                    refreshing={false}
+                    onRefresh={refetchTodos} />}
                 keyExtractor={(item, index) => `${item?.id}-${index}`} />
 
             <CreateUpdateTodoModal ref={createUpdateTodoModalRef} />

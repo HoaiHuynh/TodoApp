@@ -1,3 +1,5 @@
+import { SelectTodo } from '@/db/schema';
+
 export interface DateOption {
     label: string;
     value: Date | null;
@@ -11,6 +13,11 @@ export interface ComboOptions<T = string> {
     icon: string;
     color: string;
     backgroundColor?: string;
+}
+
+export interface TodoDto extends SelectTodo {
+    labelItem?: ComboOptions[];
+    priorityItem?: ComboOptions<number>;
 }
 
 export type ThemeType = 'light' | 'dark';

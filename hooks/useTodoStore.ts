@@ -2,6 +2,9 @@ import { desc, eq } from 'drizzle-orm';
 import { create } from 'zustand';
 import { db } from '@/db/client';
 import { SelectTodo, todos } from '@/db/schema';
+import { labelOptions, priorityOptions } from '@/constants/AppConstants';
+import { TodoDto } from '@/types/type';
+import { generateUUID } from '@/utils/AppUtil';
 
 type searchStore = {
     searchText: string;
@@ -30,30 +33,47 @@ export const useSearchText = () => useSearchStore((state) => state.searchText);
 export const useSearchActions = () => useSearchStore((state) => state.actions);
 
 type TodoStore = {
-    todos: SelectTodo[];
+    todos: TodoDto[];
     actions: {
         refetchTodos: () => void;
-        getTodo: (id: string) => SelectTodo | undefined;
+        getTodo: (id: string) => TodoDto | undefined;
     }
 }
+
+const getAllTodos = () => {
+    const fetchTodos = db.select().from(todos).orderBy(desc(todos.priority));
+
+    const allTodos = fetchTodos.all();
+    return allTodos?.map((todo) => {
+        const priorityItem = todo.priority ? priorityOptions.find((item) => item.value === todo.priority) : undefined;
+        const labelKeys = todo.label ? todo.label.split(',') : [];
+        const labelItem = labelKeys?.length > 0 ? labelOptions?.filter((item) => labelKeys?.includes(item.value)) : [];
+
+        return {
+            ...todo,
+            priorityItem,
+            labelItem
+        };
+    });
+};
 
 const useTodoStore = create<TodoStore>((set) => {
     const fetchTodos = db.select().from(todos).orderBy(desc(todos.priority));
 
     try {
         return {
-            todos: fetchTodos.all(),
+            todos: getAllTodos(),
             actions: {
-                refetchTodos: () => set({ todos: fetchTodos.all() }),
-                getTodo: (id) => fetchTodos.where(eq(todos.id, Number(id))).get()
+                refetchTodos: () => set({ todos: getAllTodos() }),
+                getTodo: (id) => fetchTodos.where(eq(todos.id, id)).get()
             }
         };
     } catch (error) {
         return {
             todos: [],
             actions: {
-                refetchTodos: () => set({ todos: fetchTodos.all() }),
-                getTodo: (id) => fetchTodos.where(eq(todos.id, Number(id))).get()
+                refetchTodos: () => set({ todos: getAllTodos() }),
+                getTodo: (id) => fetchTodos.where(eq(todos.id, id)).get()
             }
         };
     }
@@ -65,7 +85,7 @@ export const useTodoActions = () => useTodoStore((state) => state.actions);
 export const useTodo = (id?: string) => {
     if (!id) return DEFAULT_TODO;
 
-    const todo = db.select().from(todos).where(eq(todos.id, Number(id))).get();
+    const todo = db.select().from(todos).where(eq(todos.id, id)).get();
 
     return todo;
 };
@@ -82,12 +102,12 @@ export type EditTodoModel = {
 type EditTodoStore = {
     todo: EditTodoModel;
     actions: {
-        onChangePriority: (id: string | null | undefined, priority: string) => void;
-        onChangeLabel: (id: string | null | undefined, label: string) => void;
-        onChangeSchedule: (id: string | null | undefined, schedule: string) => void;
-        toggleComplete: (id: string | null | undefined, complete: boolean) => void;
+        onChangePriority: (id: string, priority: string) => void;
+        onChangeLabel: (id: string, label: string) => void;
+        onChangeSchedule: (id: string, schedule: string) => void;
+        toggleComplete: (id: string, complete: boolean) => void;
         saveTodo: (id: string | null | undefined, todo: SelectTodo) => void;
-        deleteTodo: (id: string | null | undefined) => void;
+        deleteTodo: (id: string) => void;
     }
 }
 
@@ -98,7 +118,7 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
         //     if (id) {
         //         db.update(todos)
         //             .set({ title })
-        //             .where(eq(todos.id, Number(id)))
+        //             .where(eq(todos.id, id))
         //             .run();
 
         //         useTodoStore.getState().actions.refetchTodos();
@@ -110,7 +130,7 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
         //     if (id) {
         //         db.update(todos)
         //             .set({ description })
-        //             .where(eq(todos.id, Number(id)))
+        //             .where(eq(todos.id, id))
         //             .run();
 
         //         useTodoStore.getState().actions.refetchTodos();
@@ -122,7 +142,7 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
             if (id) {
                 db.update(todos)
                     .set({ priority: Number(priority) })
-                    .where(eq(todos.id, Number(id)))
+                    .where(eq(todos.id, id))
                     .run();
 
                 useTodoStore.getState().actions.refetchTodos();
@@ -134,7 +154,7 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
             if (id) {
                 db.update(todos)
                     .set({ label })
-                    .where(eq(todos.id, Number(id)))
+                    .where(eq(todos.id, id))
                     .run();
 
                 useTodoStore.getState().actions.refetchTodos();
@@ -146,7 +166,7 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
             if (id) {
                 db.update(todos)
                     .set({ schedule })
-                    .where(eq(todos.id, Number(id)))
+                    .where(eq(todos.id, id))
                     .run();
 
                 useTodoStore.getState().actions.refetchTodos();
@@ -158,7 +178,7 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
             if (id) {
                 db.update(todos)
                     .set({ complete: complete ? 1 : 0 })
-                    .where(eq(todos.id, Number(id)))
+                    .where(eq(todos.id, id))
                     .run();
 
                 useTodoStore.getState().actions.refetchTodos();
@@ -167,14 +187,14 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
             set((state) => ({ todo: { ...state.todo, complete } }));
         },
         saveTodo: (id, todo) => {
-
+            const todoId = id || generateUUID();
             if (!todo?.title) {
                 return;
             }
 
             db.insert(todos)
                 .values({
-                    id: Number(id),
+                    id: todoId,
                     title: todo?.title,
                     description: todo?.description,
                     priority: Number(todo?.priority),
@@ -203,7 +223,7 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
         },
         deleteTodo: (id) => {
             db.delete(todos)
-                .where(eq(todos.id, Number(id)))
+                .where(eq(todos.id, id))
                 .run();
 
             useTodoStore.getState().actions.refetchTodos();

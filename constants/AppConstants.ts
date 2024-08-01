@@ -1,6 +1,8 @@
 import { addDays, endOfWeek } from 'date-fns';
 import { ComboOptions, DateOption } from '@/types/type';
 
+export const APP_CALENDAR_EVENT = 'TodoApp';
+
 export const dateOptions: DateOption[] = [
     { label: 'Today', value: new Date(), icon: 'calendar-clear-outline', color: '#16a34a' },
     { label: 'Tomorrow', value: addDays(new Date(), 1), icon: 'sunny-outline', color: '#fbbf24' },

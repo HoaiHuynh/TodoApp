@@ -1,12 +1,10 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { Alert, Keyboard, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEditTodoActions, useTodoActions } from '@/hooks/useTodoStore';
-import { SelectTodo } from '@/db/schema';
 import Checkbox from '../Checkbox';
-import { getId } from '@/utils/AppUtil';
 import BaseForm from '../form/BaseForm';
 import { BaseFormRef, IFormModel } from '../form/BaseForm.type';
 import FieldView from '../form/FieldView';
@@ -14,6 +12,11 @@ import { FieldViewChildProps } from '../form/FieldView.type';
 import PriorityPicker from '../priority-picker/PriorityPicker';
 import SchedulePicker from '../schedule-picker/SchedulePicker';
 import LabelPicker from '../label-picker/LabelPicker';
+import DateTimePicker, { DateTimePickerRef } from '../DateTimePicker';
+import { TodoDto } from '@/types/type';
+import StickButton from '../StickButton';
+import useCalendar from '@/hooks/useCalendar';
+import { Link, router } from 'expo-router';
 
 interface CreateUpdateTodoModalProps {
     onClose?: () => void;
@@ -28,33 +31,26 @@ export interface CreateUpdateTodoModalRef {
 const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateTodoModalProps>((props, ref) => {
     const { onClose, onDone } = props;
 
-    const {
-        onChangeLabel,
-        onChangeSchedule,
-        onChangePriority,
-        toggleComplete,
-
-        saveTodo
-    } = useEditTodoActions();
+    const { toggleComplete, saveTodo } = useEditTodoActions();
+    const { createEvent } = useCalendar();
 
     const { getTodo } = useTodoActions();
-    const [todo, setTodo] = useState<SelectTodo>();
+    const [todo, setTodo] = useState<TodoDto>();
     const [visible, setVisible] = useState(false);
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const refForm = useRef<BaseFormRef>(null);
+    const refDateTimePicker = useRef<DateTimePickerRef>(null);
 
-    const snapPoints = useRef(['25%', '50%', '85%']).current;
+    const snapPoints = useRef(['25%', '50%', '90%']).current;
 
-    const formModel: IFormModel<SelectTodo> = {
+    const formModel: IFormModel<TodoDto> = {
         fields: {}
     };
 
     const openModal = (id?: string) => {
         if (id) {
             const selectTodo = getTodo(id);
-            console.log('selectTodo: ', selectTodo);
-
             selectTodo && setTodo(selectTodo);
         }
 
@@ -80,8 +76,8 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
         hide: closeModal
     }));
 
-    const onSubmit = (values: SelectTodo) => {
-        saveTodo(null, values);
+    const onSubmit = (values: TodoDto) => {
+        saveTodo(todo?.id, values);
 
         onDone?.();
         closeModal();
@@ -97,17 +93,44 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
         refForm.current?.submit();
     };
 
+    const handleConfirmRemind = async (date: Date) => {
+        if (!todo?.id) {
+            return;
+        }
+
+        const eventId = await createEvent(todo, date);
+        if (eventId) {
+            Alert.alert('Success', 'Event has been created');
+        }
+        else {
+            Alert.alert('Error', 'Failed to create event');
+        }
+    };
+
+    const openRemind = () => {
+        refDateTimePicker?.current?.show();
+    };
+
+    const openFocus = () => {
+        router.push('/focus');
+    };
+
     const handleToggleComplete = (value: boolean) => {
-        toggleComplete(getId(todo?.id), value);
+        if (todo?.id) {
+            toggleComplete(todo?.id, value);
+        }
+
         refForm.current?.setValue('complete', value);
     };
+
+    const renderBackdrop = (backdropProps: BottomSheetBackdropProps) => (
+        <BottomSheetBackdrop {...backdropProps} pressBehavior={'close'} />
+    );
 
     const renderBody = () => {
         if (!visible) {
             return <></>;
         }
-
-        console.log('todo: ', todo);
 
         return (
             <BaseForm
@@ -134,27 +157,26 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
                         </FieldView>
                     </View>
 
-                    {(todo?.description || !todo?.id) && (
-                        <View className='flex flex-row items-center gap-x-4'>
-                            <Ionicons name='document-outline' size={22} color='#687076' />
-                            <FieldView name='description'>
-                                {({ value, onChange }: FieldViewChildProps) => (
-                                    <TextInput
-                                        value={value}
-                                        multiline={true}
-                                        onChangeText={onChange}
-                                        placeholder='Description'
-                                        placeholderTextColor={'gray'}
-                                        className="h-full max-h-20" />
-                                )}
-                            </FieldView>
-                        </View>
-                    )}
+                    <View className='flex flex-row items-center gap-x-4'>
+                        <Ionicons name='document-outline' size={22} color='#687076' />
+                        <FieldView name='description'>
+                            {({ value, onChange }: FieldViewChildProps) => (
+                                <TextInput
+                                    value={value}
+                                    multiline={true}
+                                    onChangeText={onChange}
+                                    placeholder='Description'
+                                    placeholderTextColor={'gray'}
+                                    className="h-full max-h-20" />
+                            )}
+                        </FieldView>
+                    </View>
 
                     <FieldView name='priority'>
                         {({ value, onChange }: FieldViewChildProps) => (
                             <PriorityPicker
                                 value={value}
+                                //@ts-ignore
                                 onChangePriority={onChange} />
                         )}
                     </FieldView>
@@ -175,6 +197,18 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
                                 onChangeDate={onChange} />
                         )}
                     </FieldView>
+
+                    {todo?.id && (
+                        <View className='border-t border-t-gray-300 pt-2'>
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={{ columnGap: 8 }}>
+                                <StickButton label='Remind me' icon='alert-circle-outline' onPress={openRemind} />
+                                <StickButton label='Focus' icon='play-circle-outline' onPress={openFocus} />
+                            </ScrollView>
+                        </View>
+                    )}
                 </View>
             </BaseForm>
         );
@@ -185,7 +219,8 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
             <BottomSheetModal
                 index={1}
                 ref={bottomSheetModalRef}
-                snapPoints={snapPoints}>
+                snapPoints={snapPoints}
+                backdropComponent={renderBackdrop}>
                 <BottomSheetView className='flex flex-1 px-4'>
                     <View className="flex flex-row justify-between">
                         <TouchableOpacity
@@ -204,6 +239,11 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
                     </View>
 
                     {renderBody()}
+
+                    <DateTimePicker
+                        ref={refDateTimePicker}
+                        mode={'datetime'}
+                        onChangeDate={handleConfirmRemind} />
                 </BottomSheetView>
             </BottomSheetModal>
         </View>
