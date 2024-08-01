@@ -22,8 +22,6 @@ const TodoItem = (props: TodoItemProps) => {
         props.onToggleComplete(item.id, complete);
     };
 
-    console.log('item: ', item);
-
     const renderLabels = () => {
         if (!item?.labelItem || item?.labelItem?.length === 0) {
             return null;
@@ -57,7 +55,7 @@ const TodoItem = (props: TodoItemProps) => {
     };
 
     return (
-        <View className='flex min-h-20 max-h-24 w-full pt-2 bg-white'>
+        <View className='flex min-h-16 max-h-24 w-full bg-white'>
             <View className='flex w-full h-full px-3'>
                 <Pressable onPress={onPress} style={styles.container}>
                     <View className='flex flex-row w-full items-center'>
@@ -71,18 +69,21 @@ const TodoItem = (props: TodoItemProps) => {
                         </View>
                     </View>
 
-                    <View className='flex flex-row w-full items-center'>
-                        <View className='h-8 w-8' />
-                        <View className='flex flex-1'>
-                            {renderLabels()}
-                        </View>
-
-                        {item?.schedule && (
-                            <View className='flex flex-row gap-x-2 my-1'>
-                                <Text className='text-sm text-slate-500 font-semibold italic'>{format(new Date(item?.schedule), 'EEE, dd MM')}</Text>
+                    {(item?.label || item?.schedule)
+                        ? <View className='flex flex-row w-full items-center'>
+                            <View className='h-8 w-8' />
+                            <View className='flex flex-1'>
+                                {renderLabels()}
                             </View>
-                        )}
-                    </View>
+
+                            {item?.schedule && (
+                                <View className='flex flex-row gap-x-2 my-1'>
+                                    <Text className='text-sm text-slate-500 font-semibold italic'>{format(new Date(item?.schedule), 'EEE, dd MM')}</Text>
+                                </View>
+                            )}
+                        </View>
+                        : <></>
+                    }
                 </Pressable>
             </View>
         </View>
@@ -95,7 +96,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
-        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomWidth: 0.5,
         borderBottomColor: '#BBBBBB',
+        justifyContent: 'center',
     }
 });

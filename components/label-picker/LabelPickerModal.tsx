@@ -7,6 +7,7 @@ import Checkbox from '../Checkbox';
 import { ComboOptions } from '@/types/type';
 
 interface LabelPickerModalProps {
+    readonly?: boolean;
     value: string[];
     onChangeLabel?: (value: ComboOptions[]) => void;
     onClose?: () => void;
@@ -18,7 +19,7 @@ export interface LabelPickerModalRef {
 }
 
 const LabelPickerModal = forwardRef<LabelPickerModalRef, LabelPickerModalProps>((props, ref) => {
-    const { value, onChangeLabel, onClose } = props;
+    const { value, readonly, onChangeLabel, onClose } = props;
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const snapPoints = useRef(['65%', '90%']).current;
@@ -84,6 +85,7 @@ const LabelPickerModal = forwardRef<LabelPickerModalRef, LabelPickerModalProps>(
                 {labelOptions.map((option, index) => (
                     <TouchableOpacity
                         key={index}
+                        disabled={readonly}
                         onPress={() => handleSelect(option)}>
                         <View className="flex flex-row h-12 items-center mx-2">
                             <View className="flex flex-1 flex-row gap-x-2 items-center">
@@ -94,7 +96,7 @@ const LabelPickerModal = forwardRef<LabelPickerModalRef, LabelPickerModalProps>(
                                 <Text className="text-base font-semibold">{option.label}</Text>
                             </View>
 
-                            <Checkbox disabled type='checkbox' value={selectedLabels?.has(option?.value)} />
+                            {!readonly && <Checkbox disabled type='checkbox' value={selectedLabels?.has(option?.value)} />}
                         </View>
                     </TouchableOpacity>
                 ))}
@@ -119,11 +121,14 @@ const LabelPickerModal = forwardRef<LabelPickerModalRef, LabelPickerModalProps>(
 
                         <Text className="text-lg font-semibold">Label</Text>
 
-                        <TouchableOpacity
-                            className="h-10 items-center justify-center rounded-full"
-                            onPress={confirmSelect}>
-                            <Text className="text-blue-500">Done</Text>
-                        </TouchableOpacity>
+                        {!readonly
+                            ? <TouchableOpacity
+                                className="h-10 items-center justify-center rounded-full"
+                                onPress={confirmSelect}>
+                                <Text className="text-blue-500">Done</Text>
+                            </TouchableOpacity>
+                            : <View className='w-10' />
+                        }
                     </View>
 
                     {renderBody()}

@@ -1,6 +1,7 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { Alert, Keyboard, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { router } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEditTodoActions, useTodoActions } from '@/hooks/useTodoStore';
@@ -16,7 +17,6 @@ import DateTimePicker, { DateTimePickerRef } from '../DateTimePicker';
 import { TodoDto } from '@/types/type';
 import StickButton from '../StickButton';
 import useCalendar from '@/hooks/useCalendar';
-import { Link, router } from 'expo-router';
 
 interface CreateUpdateTodoModalProps {
     onClose?: () => void;
@@ -112,7 +112,13 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
     };
 
     const openFocus = () => {
-        router.push('/focus');
+        Keyboard.dismiss();
+
+        setTimeout(() => {
+            setVisible(false);
+            bottomSheetModalRef.current?.dismiss();
+            router.push('/focus');
+        }, 250);
     };
 
     const handleToggleComplete = (value: boolean) => {

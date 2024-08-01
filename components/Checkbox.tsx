@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ColorValue } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ColorValue, Platform } from 'react-native';
 import Animated, { Easing, useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 interface CheckboxProps {
@@ -22,7 +22,6 @@ const Checkbox = (props: CheckboxProps) => {
     const scale = useSharedValue(0);
 
     useEffect(() => {
-        console.log('value check: ', value);
         setChecked(!!value);
 
         scale.value = withTiming(value ? 1 : 0, {
@@ -52,7 +51,7 @@ const Checkbox = (props: CheckboxProps) => {
         <TouchableOpacity disabled={disabled} onPress={handlePress} style={styles.checkboxContainer}>
             <View style={[
                 type === 'checkbox' ? styles.box : styles.radio,
-                styles.shadow,
+                Platform.OS === 'ios' && styles.shadow,
                 { borderColor: color }
             ]}>
                 <Animated.View style={[

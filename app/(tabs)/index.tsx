@@ -8,14 +8,16 @@ import { useEditTodoActions, useTodoActions, useTodos } from '@/hooks/useTodoSto
 import CreateUpdateTodoModal, { CreateUpdateTodoModalRef } from '@/components/todo/CreateUpdateTodoModal';
 import { TodoDto } from '@/types/type';
 import SwipeableTodoItem from '@/components/todo/SwipeableTodoItem';
+import EmptyTodos from '@/components/EmptyTodos';
 
 export default function HomeScreen() {
-    const createUpdateTodoModalRef = useRef<CreateUpdateTodoModalRef>(null);
 
     const todos = useTodos();
     const { refetchTodos } = useTodoActions();
     const { toggleComplete, deleteTodo } = useEditTodoActions();
     const today = format(new Date(), 'dd MMM');
+
+    const createUpdateTodoModalRef = useRef<CreateUpdateTodoModalRef>(null);
 
     const onEditTodo = (todo: TodoDto) => {
         createUpdateTodoModalRef.current?.show(`${todo.id}`);
@@ -57,8 +59,13 @@ export default function HomeScreen() {
             <Animated.FlatList
                 data={todos}
                 renderItem={renderItem}
+                ListEmptyComponent={<EmptyTodos />}
+                style={{ flex: 1 }}
+                contentContainerStyle={{ flexGrow: 1 }}
                 refreshControl={<RefreshControl
                     refreshing={false}
+                    colors={['#3b82f6']}
+                    tintColor={'#3b82f6'}
                     onRefresh={refetchTodos} />}
                 keyExtractor={(item, index) => `${item?.id}-${index}`} />
 

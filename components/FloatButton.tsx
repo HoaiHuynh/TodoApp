@@ -30,7 +30,7 @@ const FloatButton = (props: FloatButtonProps) => {
     }));
 
     return (
-        <Animated.View style={[styles.container, animatedStyle]} className='bg-blue-500'>
+        <Animated.View style={[styles.container, animatedStyle]} className='bg-violet-600'>
             <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.button}

@@ -6,6 +6,7 @@ import { priorityOptions } from '@/constants/AppConstants';
 import Checkbox from '../Checkbox';
 
 interface PriorityPickerModalProps {
+    readonly?: boolean;
     value?: number | null;
     onChangePriority?: (value: number | null | undefined) => void;
     onClose?: () => void;
@@ -17,7 +18,7 @@ export interface PriorityPickerModalRef {
 }
 
 const PriorityPickerModal = forwardRef<PriorityPickerModalRef, PriorityPickerModalProps>((props, ref) => {
-    const { value, onChangePriority, onClose } = props;
+    const { value, readonly, onChangePriority, onClose } = props;
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const snapPoints = useRef(['35%', '90%']).current;
@@ -58,26 +59,24 @@ const PriorityPickerModal = forwardRef<PriorityPickerModalRef, PriorityPickerMod
     const renderBody = () => {
         return (
             <View>
-                {priorityOptions.map((option, index) => {
-                    console.log('option: ', option, `${selectedPriority}` === `${option?.value}`);
-                    return (
-                        <TouchableOpacity
-                            key={index}
-                            onPress={() => handleSelect(option.value)}>
-                            <View className="flex flex-row h-12 items-center mx-2">
-                                <View className="flex flex-1 flex-row gap-x-2 items-center">
-                                    <Ionicons
-                                        name={option.icon as any}
-                                        size={22}
-                                        color={option.color} />
-                                    <Text className="text-base font-semibold">{option.label}</Text>
-                                </View>
-
-                                <Checkbox disabled value={`${selectedPriority}` === `${option?.value}`} />
+                {priorityOptions.map((option, index) => (
+                    <TouchableOpacity
+                        key={index}
+                        disabled={readonly}
+                        onPress={() => handleSelect(option.value)}>
+                        <View className="flex flex-row h-12 items-center mx-2">
+                            <View className="flex flex-1 flex-row gap-x-2 items-center">
+                                <Ionicons
+                                    name={option.icon as any}
+                                    size={22}
+                                    color={option.color} />
+                                <Text className="text-base font-semibold">{option.label}</Text>
                             </View>
-                        </TouchableOpacity>
-                    );
-                })}
+
+                            {!readonly && <Checkbox disabled value={`${selectedPriority}` === `${option?.value}`} />}
+                        </View>
+                    </TouchableOpacity>
+                ))}
             </View>
         );
     };
@@ -99,11 +98,14 @@ const PriorityPickerModal = forwardRef<PriorityPickerModalRef, PriorityPickerMod
 
                         <Text className="text-lg font-semibold">Priority</Text>
 
-                        <TouchableOpacity
-                            className="h-10 items-center justify-center rounded-full"
-                            onPress={confirmSelect}>
-                            <Text className="text-blue-500">Done</Text>
-                        </TouchableOpacity>
+                        {!readonly
+                            ? <TouchableOpacity
+                                className="h-10 items-center justify-center rounded-full"
+                                onPress={confirmSelect}>
+                                <Text className="text-blue-500">Done</Text>
+                            </TouchableOpacity>
+                            : <View className='w-10' />
+                        }
                     </View>
 
                     {renderBody()}

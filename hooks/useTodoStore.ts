@@ -1,4 +1,4 @@
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, like } from 'drizzle-orm';
 import { create } from 'zustand';
 import { db } from '@/db/client';
 import { SelectTodo, todos } from '@/db/schema';
@@ -6,8 +6,9 @@ import { labelOptions, priorityOptions } from '@/constants/AppConstants';
 import { TodoDto } from '@/types/type';
 import { generateUUID } from '@/utils/AppUtil';
 
+//#region SEARCH_TODOS
 type searchStore = {
-    searchText: string;
+    searchTodos: TodoDto[];
     actions: {
         onChangeSearchText: (text: string) => void;
     }
@@ -22,16 +23,39 @@ const DEFAULT_TODO = {
     complete: false
 };
 
-const useSearchStore = create<searchStore>((set) => ({
-    searchText: '',
-    actions: {
-        onChangeSearchText: (text) => set({ searchText: text })
-    }
-}));
+const searchTodos = (text: string): TodoDto[] => {
+    const fetchTodos = db.select().from(todos).where(like(todos.title, `%${text}%`)).orderBy(desc(todos.priority));
 
-export const useSearchText = () => useSearchStore((state) => state.searchText);
+    return fetchTodos.all().map((todo) => {
+        const priorityItem = todo.priority ? priorityOptions.find((item) => item.value === todo.priority) : undefined;
+        const labelKeys = todo.label ? todo.label.split(',') : [];
+        const labelItem = labelKeys?.length > 0 ? labelOptions?.filter((item) => labelKeys?.includes(item.value)) : [];
+
+        return {
+            ...todo,
+            priorityItem,
+            labelItem
+        };
+    });
+};
+
+const useSearchStore = create<searchStore>((set) => {
+    return {
+        searchTodos: [],
+        actions: {
+            onChangeSearchText: (text) => {
+                const filterTodos = searchTodos(text);
+                set({ searchTodos: filterTodos });
+            }
+        }
+    };
+});
+
+export const useSearchTodos = () => useSearchStore((state) => state.searchTodos);
 export const useSearchActions = () => useSearchStore((state) => state.actions);
+//#endregion
 
+//#region TODOS
 type TodoStore = {
     todos: TodoDto[];
     actions: {
@@ -44,6 +68,7 @@ const getAllTodos = () => {
     const fetchTodos = db.select().from(todos).orderBy(desc(todos.priority));
 
     const allTodos = fetchTodos.all();
+
     return allTodos?.map((todo) => {
         const priorityItem = todo.priority ? priorityOptions.find((item) => item.value === todo.priority) : undefined;
         const labelKeys = todo.label ? todo.label.split(',') : [];
@@ -89,7 +114,55 @@ export const useTodo = (id?: string) => {
 
     return todo;
 };
+//#endregion
 
+//#region RECENT_TODOS
+type RecentTodoStore = {
+    recentTodos: TodoDto[];
+    actions: {
+        refetchRecentTodos: () => void;
+    }
+}
+
+const getRecentTodos = (): TodoDto[] => {
+    const fetchTodos = db.select().from(todos).orderBy(desc(todos.createdAt)).limit(5);
+
+    return fetchTodos.all().map((todo) => {
+        const priorityItem = todo.priority ? priorityOptions.find((item) => item.value === todo.priority) : undefined;
+        const labelKeys = todo.label ? todo.label.split(',') : [];
+        const labelItem = labelKeys?.length > 0 ? labelOptions?.filter((item) => labelKeys?.includes(item.value)) : [];
+
+        return {
+            ...todo,
+            priorityItem,
+            labelItem
+        };
+    });
+};
+
+const useRecentTodoStore = create<RecentTodoStore>((set) => {
+    try {
+        return {
+            recentTodos: getRecentTodos(),
+            actions: {
+                refetchRecentTodos: () => set({ recentTodos: getRecentTodos() })
+            }
+        };
+    } catch (error) {
+        return {
+            recentTodos: [],
+            actions: {
+                refetchRecentTodos: () => set({ recentTodos: getRecentTodos() })
+            }
+        };
+    }
+});
+
+export const useRecentTodos = () => useRecentTodoStore((state) => state.recentTodos);
+export const useRecentTodoActions = () => useRecentTodoStore((state) => state.actions);
+//#endregion
+
+//#region EDIT_TODO
 export type EditTodoModel = {
     title?: string;
     description?: string;
@@ -233,3 +306,4 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
 
 export const useEditTodo = () => useEditTodoStore((state) => state.todo);
 export const useEditTodoActions = () => useEditTodoStore((state) => state.actions);
+//#endregion
