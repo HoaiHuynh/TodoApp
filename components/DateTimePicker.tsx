@@ -29,10 +29,12 @@ const DateTimePicker = forwardRef<DateTimePickerRef, DateTimePickerProps>((props
 
     const hideDatePicker = () => {
         setVisible(false);
+        onClose?.();
     };
 
     const handleConfirm = (date: Date) => {
-        console.warn('A date has been picked: ', date);
+        onChangeDate?.(date);
+        
         hideDatePicker();
     };
 

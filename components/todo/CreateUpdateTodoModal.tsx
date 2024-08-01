@@ -1,19 +1,19 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import Toast from 'react-native-toast-message';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useEditTodo, useEditTodoActions, useTodoActions } from '@/hooks/useTodoStore';
+import { useEditTodoActions, useTodoActions } from '@/hooks/useTodoStore';
 import { SelectTodo } from '@/db/schema';
 import Checkbox from '../Checkbox';
-import SchedulePickerModal, { SchedulePickerModalRef } from '../SchedulePickerModal';
 import { getId } from '@/utils/AppUtil';
 import BaseForm from '../form/BaseForm';
 import { BaseFormRef, IFormModel } from '../form/BaseForm.type';
 import FieldView from '../form/FieldView';
 import { FieldViewChildProps } from '../form/FieldView.type';
-import { BaseActionSheetRef, BaseActionSheet } from '../action-sheet';
-import { PriorityType } from '@/types/type';
-import PriorityPickerModal, { PriorityPickerModalRef } from '../PriorityPickerModal';
+import PriorityPicker from '../priority-picker/PriorityPicker';
+import SchedulePicker from '../schedule-picker/SchedulePicker';
+import LabelPicker from '../label-picker/LabelPicker';
 
 interface CreateUpdateTodoModalProps {
     onClose?: () => void;
@@ -29,15 +29,6 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
     const { onClose, onDone } = props;
 
     const {
-        title,
-        description,
-        complete,
-        label,
-        priority,
-        schedule
-    } = useEditTodo();
-
-    const {
         onChangeLabel,
         onChangeSchedule,
         onChangePriority,
@@ -51,14 +42,9 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
     const [visible, setVisible] = useState(false);
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    const refSchedule = useRef<SchedulePickerModalRef>(null);
-    const refPriority = useRef<PriorityPickerModalRef>(null);
     const refForm = useRef<BaseFormRef>(null);
-    const refActionSheet = useRef<BaseActionSheetRef>(null);
 
     const snapPoints = useRef(['25%', '50%', '85%']).current;
-
-    console.log('re-render CreateUpdateTodoModal');
 
     const formModel: IFormModel<SelectTodo> = {
         fields: {}
@@ -67,31 +53,26 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
     const openModal = (id?: string) => {
         if (id) {
             const selectTodo = getTodo(id);
+            console.log('selectTodo: ', selectTodo);
+
             selectTodo && setTodo(selectTodo);
         }
 
         setVisible(true);
-        bottomSheetModalRef.current?.present();
+
+        setTimeout(() => {
+            bottomSheetModalRef.current?.present();
+        }, 150);
     };
 
     const closeModal = () => {
-        bottomSheetModalRef.current?.dismiss();
-        setVisible(false);
-        onClose?.();
-    };
+        Keyboard.dismiss();
 
-    const handleSheetChanges = (index: number) => {
-        if (index === 0) {
-            closeModal();
-        };
-    };
-
-    const onSelectPriority = (value: PriorityType) => {
-
-    };
-
-    const handleShowPriority = () => {
-        refPriority.current?.show();
+        setTimeout(() => {
+            setVisible(false);
+            bottomSheetModalRef.current?.dismiss();
+            onClose?.();
+        }, 250);
     };
 
     useImperativeHandle(ref, () => ({
@@ -100,7 +81,20 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
     }));
 
     const onSubmit = (values: SelectTodo) => {
-        console.log('values: ', values);
+        saveTodo(null, values);
+
+        onDone?.();
+        closeModal();
+
+        Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: todo?.id ? 'Todo updated successfully' : 'Todo created successfully'
+        });
+    };
+
+    const confirmTodo = () => {
+        refForm.current?.submit();
     };
 
     const handleToggleComplete = (value: boolean) => {
@@ -113,10 +107,16 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
             return <></>;
         }
 
+        console.log('todo: ', todo);
+
         return (
-            <BaseForm ref={refForm} model={formModel} onSubmit={onSubmit}>
+            <BaseForm
+                ref={refForm}
+                model={formModel}
+                defaultValues={todo}
+                onSubmit={onSubmit}>
                 <View className='flex flex-1 gap-y-2'>
-                    <View className='flex flex-row items-center'>
+                    <View className='flex flex-row items-center min-h-14'>
                         <FieldView name='complete'>
                             {({ value }: FieldViewChildProps) => (
                                 <Checkbox value={value} onChange={handleToggleComplete} />
@@ -128,14 +128,15 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
                                     value={value}
                                     onChangeText={onChange}
                                     placeholder='e.g. Buy a new Macbook'
+                                    placeholderTextColor='#9ca3af'
                                     className="flex-1 text-3xl font-semibold h-14" />
                             )}
                         </FieldView>
                     </View>
 
-                    {todo?.description || !todo?.id && (
+                    {(todo?.description || !todo?.id) && (
                         <View className='flex flex-row items-center gap-x-4'>
-                            <Ionicons name='menu-outline' size={22} color='#687076' />
+                            <Ionicons name='document-outline' size={22} color='#687076' />
                             <FieldView name='description'>
                                 {({ value, onChange }: FieldViewChildProps) => (
                                     <TextInput
@@ -150,51 +151,59 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
                         </View>
                     )}
 
-                    <View className='flex flex-row items-center gap-x-4 h-10'>
-                        <Ionicons name='flag-outline' size={22} color='#687076' />
-                        <TouchableOpacity onPress={handleShowPriority}>
-                            <Text>{priority || 'hoai'}</Text>
-                        </TouchableOpacity>
-                    </View>
+                    <FieldView name='priority'>
+                        {({ value, onChange }: FieldViewChildProps) => (
+                            <PriorityPicker
+                                value={value}
+                                onChangePriority={onChange} />
+                        )}
+                    </FieldView>
 
-                    <View className='flex flex-row items-center gap-x-4 h-10'>
-                        <Ionicons name='bookmark-outline' size={22} color='#687076' />
-                        <Text>{label || 'hoai'}</Text>
-                    </View>
+                    <FieldView name='label'>
+                        {({ value, onChange }: FieldViewChildProps) => (
+                            <LabelPicker
+                                value={value}
+                                onChangeLabel={onChange} />
+                        )}
+                    </FieldView>
 
-                    <TouchableOpacity onPress={() => refSchedule.current?.show()}>
-                        <View className='flex flex-row items-center gap-x-4 h-10'>
-                            <Ionicons name='calendar-outline' size={22} color='#687076' />
-                            <Text>{schedule || 'hoai'}</Text>
-                        </View>
-                    </TouchableOpacity>
+                    <FieldView name='schedule'>
+                        {({ value, onChange }: FieldViewChildProps) => (
+                            <SchedulePicker
+                                value={value}
+                                // @ts-ignore
+                                onChangeDate={onChange} />
+                        )}
+                    </FieldView>
                 </View>
             </BaseForm>
         );
     };
-
 
     return (
         <View className='flex flex-1'>
             <BottomSheetModal
                 index={1}
                 ref={bottomSheetModalRef}
-                snapPoints={snapPoints}
-                onChange={handleSheetChanges}>
+                snapPoints={snapPoints}>
                 <BottomSheetView className='flex flex-1 px-4'>
-                    <View className='flex flex-row justify-end'>
-                        <TouchableOpacity className='h-10 w-10 items-center justify-center rounded-full' onPress={closeModal}>
-                            <View className='h-8 w-8 rounded-full items-center justify-center bg-gray-200'>
-                                <Ionicons name='close' size={22} color='gray' />
-                            </View>
+                    <View className="flex flex-row justify-between">
+                        <TouchableOpacity
+                            className="h-10 items-center justify-center rounded-full"
+                            onPress={closeModal}>
+                            <Text className="text-red-400">Close</Text>
+                        </TouchableOpacity>
+
+                        <Text className="text-lg font-semibold">{todo?.id ? 'Detail Todo' : 'Create Todo'}</Text>
+
+                        <TouchableOpacity
+                            className="h-10 items-center justify-center rounded-full"
+                            onPress={confirmTodo}>
+                            <Text className="text-blue-400">Done</Text>
                         </TouchableOpacity>
                     </View>
 
                     {renderBody()}
-
-                    <SchedulePickerModal ref={refSchedule} />
-                    <PriorityPickerModal ref={refPriority} />
-                    <BaseActionSheet ref={refActionSheet} />
                 </BottomSheetView>
             </BottomSheetModal>
         </View>

@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SQLiteProvider } from 'expo-sqlite';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import Toast from 'react-native-toast-message';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 
 import { useLoadAssets } from '@/hooks/useLoadAssets';
@@ -31,6 +32,7 @@ export default function RootLayout() {
                             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                             <Stack.Screen name="+not-found" />
                         </Stack>
+                        <Toast />
                     </BottomSheetModalProvider>
                 </ThemeProvider>
             </GestureHandlerRootView>

@@ -9,8 +9,20 @@ export const dateOptions: DateOption[] = [
 ];
 
 
-export const priorityOptions: ComboOptions[] = [
-    { label: 'Low', value: 'low', icon: 'arrow-down-circle-outline', color: '#16a34a' },
-    { label: 'Medium', value: 'medium', icon: 'arrow-up-circle-outline', color: '#fbbf24' },
-    { label: 'High', value: 'high', icon: 'arrow-up-circle-outline', color: '#f87171' },
+export const priorityOptions: ComboOptions<number>[] = [
+    { label: 'Low', value: 3, icon: 'flag-outline', color: '#16a34a' },
+    { label: 'Medium', value: 2, icon: 'flag-outline', color: '#fbbf24' },
+    { label: 'High', value: 1, icon: 'flag-outline', color: '#f87171' },
+];
+
+export const labelOptions: ComboOptions[] = [
+    { label: 'Personal', value: 'personal', icon: 'person-circle-outline', color: '#16a34a', backgroundColor: '#f0fff4' },
+    { label: 'Work', value: 'work', icon: 'briefcase-outline', color: '#fbbf24', backgroundColor: '#fffbdd' },
+    { label: 'Study', value: 'study', icon: 'school-outline', color: '#f87171', backgroundColor: '#fef2f2' },
+    { label: 'Shopping', value: 'shopping', icon: 'cart-outline', color: '#3b82f6', backgroundColor: '#eff6ff' },
+    { label: 'Home', value: 'home', icon: 'home-outline', color: '#f472b6', backgroundColor: '#fef5f7' },
+    { label: 'Health', value: 'health', icon: 'heart-outline', color: '#f59e0b', backgroundColor: '#fffbeb' },
+    { label: 'Finance', value: 'finance', icon: 'wallet-outline', color: '#10b981', backgroundColor: '#f0fdf4' },
+    { label: 'Entertainment', value: 'entertainment', icon: 'film-outline', color: '#3b82f6', backgroundColor: '#eff6ff' },
+    { label: 'Other', value: 'other', icon: 'ellipsis-horizontal-circle-outline', color: '#94a3b8', backgroundColor: '#f4f4f5' },
 ];

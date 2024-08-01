@@ -5,11 +5,12 @@ export interface DateOption {
     color: string;
 }
 
-export interface ComboOptions {
+export interface ComboOptions<T = string> {
     label: string;
-    value: string;
+    value: T;
     icon: string;
     color: string;
+    backgroundColor?: string;
 }
 
 export type ThemeType = 'light' | 'dark';

@@ -86,7 +86,7 @@ type EditTodoStore = {
         onChangeLabel: (id: string | null | undefined, label: string) => void;
         onChangeSchedule: (id: string | null | undefined, schedule: string) => void;
         toggleComplete: (id: string | null | undefined, complete: boolean) => void;
-        saveTodo: (id: string | null | undefined) => void;
+        saveTodo: (id: string | null | undefined, todo: SelectTodo) => void;
         deleteTodo: (id: string | null | undefined) => void;
     }
 }
@@ -166,33 +166,32 @@ const useEditTodoStore = create<EditTodoStore>((set, get) => ({
 
             set((state) => ({ todo: { ...state.todo, complete } }));
         },
-        saveTodo: (id) => {
-            const { title, description, priority, label, schedule, complete } = get().todo;
+        saveTodo: (id, todo) => {
 
-            if (!title) {
+            if (!todo?.title) {
                 return;
             }
 
             db.insert(todos)
                 .values({
                     id: Number(id),
-                    title,
-                    description,
-                    priority: Number(priority),
-                    label,
-                    schedule,
-                    complete: complete ? 1 : 0,
+                    title: todo?.title,
+                    description: todo?.description,
+                    priority: Number(todo?.priority),
+                    label: todo?.label,
+                    schedule: todo?.schedule ? new Date(todo?.schedule).toISOString() : null,
+                    complete: todo?.complete ? 1 : 0,
                     createdAt: new Date().toISOString(),
                 })
                 .onConflictDoUpdate({
                     target: todos.id,
                     set: {
-                        title,
-                        description,
-                        priority: Number(priority),
-                        label,
-                        schedule,
-                        complete: complete ? 1 : 0,
+                        title: todo?.title,
+                        description: todo?.description,
+                        priority: Number(todo?.priority),
+                        label: todo?.label,
+                        schedule: todo?.schedule ? new Date(todo?.schedule).toISOString() : null,
+                        complete: todo?.complete ? 1 : 0,
                         updatedAt: new Date().toISOString()
                     }
                 })

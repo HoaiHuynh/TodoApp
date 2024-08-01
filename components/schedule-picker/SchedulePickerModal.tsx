@@ -3,8 +3,9 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { format, isSameDay } from 'date-fns';
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
-import DateTimePicker, { DateTimePickerRef } from './DateTimePicker';
+import DateTimePicker, { DateTimePickerRef } from '../DateTimePicker';
 import { dateOptions } from '@/constants/AppConstants';
+import Checkbox from '../Checkbox';
 
 interface SchedulePickerModalProps {
     value?: Date;
@@ -41,9 +42,13 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
         onClose?.();
     };
 
+    const confirmSelect = () => {
+        onChangeDate?.(selectedDate);
+        closeModal();
+    };
+
     const handleSelectDate = (date: Date | null | undefined) => {
         setSelectedDate(date);
-        onChangeDate?.(date);
     };
 
     const renderBody = () => {
@@ -53,18 +58,11 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
                     <TouchableOpacity
                         key={index}
                         onPress={() => handleSelectDate(option.value)}>
-                        <View className="flex flex-row h-12 items-center mx-2">
-                            {selectedDate && option?.value && isSameDay(selectedDate, option?.value) && (
-                                <Ionicons
-                                    name={'checkmark-circle'}
-                                    size={24}
-                                    color="#3b82f6" />
-                            )}
-
+                        <View className="flex flex-row h-12 items-center ml-2 gap-x-3">
                             <View className="flex flex-1 flex-row gap-x-2 items-center">
                                 <Ionicons
                                     name={option.icon as any}
-                                    size={24}
+                                    size={22}
                                     color={option.color} />
                                 <Text className="text-base font-semibold">{option.label}</Text>
                             </View>
@@ -75,7 +73,7 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
                                 </Text>
                             )}
 
-
+                            <Checkbox value={(selectedDate && option?.value) ? isSameDay(selectedDate, option?.value) : false} />
                         </View>
                     </TouchableOpacity>
                 ))}
@@ -85,7 +83,7 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
                         <View className="flex flex-1 flex-row gap-x-2 items-center">
                             <Ionicons
                                 name={'calendar-number-outline'}
-                                size={24}
+                                size={22}
                                 color="#3b82f6" />
                             <Text className="text-base font-semibold">Choose date</Text>
                         </View>
@@ -119,7 +117,7 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
 
                         <TouchableOpacity
                             className="h-10 items-center justify-center rounded-full"
-                            onPress={closeModal}>
+                            onPress={confirmSelect}>
                             <Text className="text-blue-400">Done</Text>
                         </TouchableOpacity>
                     </View>
@@ -127,7 +125,11 @@ const SchedulePickerModal = forwardRef<SchedulePickerModalRef, SchedulePickerMod
                     {renderBody()}
                 </BottomSheetView>
             </BottomSheetModal>
-            <DateTimePicker ref={refDateTimePicker} mode={mode} onChangeDate={handleSelectDate} />
+            <DateTimePicker
+                ref={refDateTimePicker}
+                mode={mode}
+                value={selectedDate!}
+                onChangeDate={handleSelectDate} />
         </View>
     );
 });
