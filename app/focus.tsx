@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { Audio } from 'expo-av';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { CountdownCircleTimer, TimeProps } from '@/components/count-down';
 import DateTimePicker, { DateTimePickerRef } from '@/components/DateTimePicker';
 import { getRemainTime } from '@/utils/AppUtil';
-import { Ionicons } from '@expo/vector-icons';
 import TimePicker, { TimePickerRef, TimePickerValue } from '@/components/TimePicker';
 
 const CountdownScreen = () => {
@@ -30,6 +30,12 @@ const CountdownScreen = () => {
         };
     }, [sound]);
 
+    useEffect(() => {
+        if (!isRunning && sound) {
+            sound?.stopAsync();
+        }
+    }, [isRunning, sound]);
+
     const opacityStyle = useAnimatedStyle(() => {
         return {
             opacity: opacity.value
@@ -47,10 +53,15 @@ const CountdownScreen = () => {
     });
 
     const playSound = async () => {
-        const { sound } = await Audio.Sound.createAsync(require('../assets/sounds/alarm.mp3'));
-        setSound(sound);
+        try {
+            const { sound } = await Audio.Sound.createAsync(require('../assets/sounds/alarm.mp3'));
+            setSound(sound);
 
-        await sound.playAsync();
+            await sound.playAsync();
+            await sound.setIsLoopingAsync(true);
+        } catch (error) {
+            console.log('Error playing sound', error);
+        }
     };
 
     const closeFocus = () => {
@@ -101,9 +112,18 @@ const CountdownScreen = () => {
     };
 
     const handleComplete = () => {
-        playSound();
-
-        setIsRunning(false);
+        playSound()
+            .then(() => {
+                Alert.alert('Time is up!', 'Your time is up!', [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            setIsRunning(false);
+                            opacity.value = withTiming(1, { duration: 500 });
+                        }
+                    }
+                ]);
+            });
     };
 
     const renderButton = () => {

@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
-import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import { useFonts } from 'expo-font';
-import { openDatabaseSync } from 'expo-sqlite/next';
 import { SplashScreen } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import useCalendar from './useCalendar';
@@ -10,7 +8,7 @@ import useCalendar from './useCalendar';
 SplashScreen.preventAutoHideAsync();
 
 export function useLoadAssets() {
-    const sqliteDB = openDatabaseSync('todos.db');
+    // const sqliteDB = openDatabaseSync('todos.db');
     const { requestPermission } = useCalendar();
 
     const [hasLoadedFonts, loadingFontsError] = useFonts({
@@ -18,15 +16,17 @@ export function useLoadAssets() {
         ...FontAwesome.font,
     });
 
-    useDrizzleStudio(sqliteDB);
+    // useDrizzleStudio(sqliteDB);
+
+    useEffect(() => {
+        requestPermission();
+    }, []);
 
     useEffect(() => {
         if (loadingFontsError) throw loadingFontsError;
     }, [loadingFontsError]);
 
     useEffect(() => {
-        requestPermission();
-
         if (hasLoadedFonts) {
             SplashScreen.hideAsync();
         };

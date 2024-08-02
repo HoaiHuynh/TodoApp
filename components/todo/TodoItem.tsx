@@ -56,7 +56,7 @@ const TodoItem = (props: TodoItemProps) => {
 
     return (
         <View className='flex min-h-16 max-h-24 w-full bg-white'>
-            <View className='flex w-full h-full px-3'>
+            <View className='flex w-full h-full pl-3'>
                 <Pressable onPress={onPress} style={styles.container}>
                     <View className='flex flex-row w-full items-center'>
                         <Checkbox value={Boolean(item?.complete)} onChange={onToggle} color={item?.priorityItem?.color} />
@@ -70,7 +70,7 @@ const TodoItem = (props: TodoItemProps) => {
                     </View>
 
                     {(item?.label || item?.schedule)
-                        ? <View className='flex flex-row w-full items-center'>
+                        ? <View className='flex flex-row w-full items-center pr-3'>
                             <View className='h-8 w-8' />
                             <View className='flex flex-1'>
                                 {renderLabels()}
