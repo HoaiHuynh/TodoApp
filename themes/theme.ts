@@ -20,6 +20,7 @@ export const themesVariables = {
         '--popover-foreground': '240 10% 4%',
         '--input': '240 6% 90%',
         '--radius': '0.5',
+        '--item': '0 0% 100%',
     },
     dark: {
         '--background': '240 10% 3.92%',
@@ -38,6 +39,7 @@ export const themesVariables = {
         '--popover-foreground': '0 0% 98.04%',
         '--input': '0 0% 23%',
         '--radius': '0.5',
+        '--item': '0 0% 15%',
     },
     //NEW THEME
     'deep-ocean': {
@@ -57,6 +59,7 @@ export const themesVariables = {
         '--popover-foreground': '210 20% 98.04%',
         '--input': '0 0% 25.1%',
         '--radius': '0.5',
+        '--item': '0 0% 100%',
     }
     // ----------------
 };

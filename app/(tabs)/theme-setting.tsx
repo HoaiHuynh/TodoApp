@@ -9,6 +9,7 @@ import {
 import { useState } from 'react';
 import clsx from 'clsx';
 import { useTheme } from '@/themes/context';
+import { router } from 'expo-router';
 
 const ThemeSetting = () => {
     const { theme, systemEnabled, handleThemeSwitch } = useTheme();
@@ -36,7 +37,7 @@ const ThemeSetting = () => {
 
             <View className="flex flex-row gap-6 p-4">
                 <Pressable
-                    onPress={() => handleThemeSwitch('system')}
+                    onPress={() => handleThemeSwitch('system' as any)}
                     className={clsx(
                         'transition-colors duration-300 py-2 px-3 border border-input rounded active:bg-accent',
                         systemEnabled && 'bg-primary'
@@ -78,6 +79,16 @@ const ThemeSetting = () => {
                 className="absolute bottom-2 p-2 border-[0.05rem] border-accent rounded">
                 <Text className="text-xs font-light text-accent">
                     Just a programming cat.
+                </Text>
+            </Pressable>
+
+            <Pressable
+                onPress={() => {
+                    router.navigate('/flow');
+                }}
+                className="p-2 border-[0.05rem] border-accent rounded">
+                <Text className="text-xs font-light text-accent">
+                    Flow Example
                 </Text>
             </Pressable>
 

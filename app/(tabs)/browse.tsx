@@ -19,9 +19,11 @@ interface SettingItemProps {
 const SettingItem = (props: SettingItemProps) => {
     const { theme } = useTheme();
     return (
-        <Pressable onPress={props?.onPress} className='flex flex-row h-12 w-full items-center gap-x-2'>
-            <Ionicons name={props?.icon as any} color={Colors[theme].tint} size={22} />
-            <View className={`${!props?.disableLine && 'border-b border-b-neutral-300'} flex h-full flex-1 flex-row items-center`}>
+        <Pressable onPress={props?.onPress} className='flex flex-row h-12 w-full items-center'>
+            <View className='bg-muted items-center justify-center h-10 w-10 rounded-lg mr-4'>
+                <Ionicons name={props?.icon as any} color={Colors[theme].tint} size={18} />
+            </View>
+            <View className={`${!props?.disableLine && 'border-b-[0.05rem] border-accent'} flex h-full flex-1 flex-row items-center pr-4`}>
                 <Text className='flex-1 text-xl text-foreground'>{props.title}</Text>
                 <Text className='text-xl text-primary'>{props.value}</Text>
             </View>
@@ -50,19 +52,19 @@ const Browse = () => {
                 contentContainerStyle={{ flexGrow: 1 }}
                 showsVerticalScrollIndicator={false}>
 
-                <View className='bg- p-4 rounded-2xl mt-4'>
+                <View className='bg-item pl-4 py-1 rounded-2xl mt-4'>
                     <SettingItem
                         title='Todos'
-                        icon='albums-outline'
+                        icon='albums'
                         value={todos?.length.toString()} />
                     <SettingItem
                         title='Priority'
-                        icon='flag-outline'
+                        icon='flag'
                         value={priorityOptions?.length.toString()}
                         onPress={onOpenPriority} />
                     <SettingItem
                         title='Labels'
-                        icon='bookmarks-outline'
+                        icon='bookmarks'
                         disableLine
                         value={labelOptions?.length.toString()}
                         onPress={onOpenLabel} />

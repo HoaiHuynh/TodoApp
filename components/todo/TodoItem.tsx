@@ -55,9 +55,9 @@ const TodoItem = (props: TodoItemProps) => {
     };
 
     return (
-        <View className='flex min-h-16 max-h-24 w-full bg-background'>
+        <View className='flex min-h-16 max-h-24 w-full bg-item'>
             <View className='flex w-full h-full pl-3'>
-                <Pressable onPress={onPress} style={styles.container}>
+                <Pressable onPress={onPress} style={styles.container} className='border-b-[0.05rem] border-accent'>
                     <View className='flex flex-row w-full items-center'>
                         <Checkbox value={Boolean(item?.complete)} onChange={onToggle} color={item?.priorityItem?.color} />
 
@@ -96,8 +96,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
-        borderBottomWidth: 0.5,
-        borderBottomColor: '#BBBBBB',
         justifyContent: 'center',
     }
 });

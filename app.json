@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hoai3009.TodoApp"
     },
     "android": {
       "adaptiveIcon": {
@@ -39,7 +40,8 @@
           "calendarPermission": "Allow $(PRODUCT_NAME) to access your calendar",
           "remindersPermission": "Allow $(PRODUCT_NAME) to access your reminders"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

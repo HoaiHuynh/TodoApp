@@ -22,7 +22,8 @@ export type ThemesVariables =
     | 'popover-foreground'
     | 'destructive'
     | 'destructive-foreground'
-    | 'input';
+    | 'input'
+    | 'item';
 
 /**
  * The system theme which is always dark, light or a custom theme in the app.
