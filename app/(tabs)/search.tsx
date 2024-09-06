@@ -2,10 +2,10 @@ import React, { useRef, useState } from 'react';
 import { ListRenderItemInfo, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { Stack } from 'expo-router';
+import Toast from 'react-native-toast-message';
 import CreateUpdateTodoModal, { CreateUpdateTodoModalRef } from '@/components/todo/CreateUpdateTodoModal';
 import { useEditTodoActions, useRecentTodos, useSearchActions, useSearchTodos } from '@/hooks/useTodoStore';
 import { TodoDto } from '@/types/type';
-import Toast from 'react-native-toast-message';
 import SwipeableTodoItem from '@/components/todo/SwipeableTodoItem';
 import SearchInput from '@/components/SearchInput';
 import EmptyTodos from '@/components/EmptyTodos';
@@ -68,13 +68,13 @@ const Search = () => {
 
 
     return (
-        <View className='flex flex-1'>
+        <View className='flex flex-1 bg-background'>
             <Stack.Screen options={{
                 headerLargeTitle: true,
                 title: 'Search',
             }} />
 
-            <View className='p-2 bg-white'>
+            <View className='p-2 bg-background'>
                 <SearchInput
                     debounceTime={350}
                     onChangeText={handleSearch} />

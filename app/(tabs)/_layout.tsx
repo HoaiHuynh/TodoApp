@@ -4,13 +4,13 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import FloatButton from '@/components/FloatButton';
 import CreateUpdateTodoModal, { CreateUpdateTodoModalRef } from '@/components/todo/CreateUpdateTodoModal';
+import { useTheme } from '@/themes/context';
 
 export default function TabLayout() {
     const { bottom = 0 } = useSafeAreaInsets();
-    const colorScheme = useColorScheme();
+    const { theme } = useTheme();
 
     const createUpdateTodoModalRef = useRef<CreateUpdateTodoModalRef>(null);
 
@@ -23,14 +23,22 @@ export default function TabLayout() {
             <View className='flex flex-1'>
                 <Tabs
                     screenOptions={{
-                        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-                        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
+                        tabBarActiveTintColor: Colors[theme].tint,
+                        tabBarInactiveTintColor: Colors[theme].tabIconDefault,
+                        tabBarStyle: {
+                            backgroundColor: Colors[theme].background,
+                        }
                     }}>
                     <Tabs.Screen
                         name="index"
                         options={{
                             title: 'Home',
-
+                            headerStyle: {
+                                backgroundColor: Colors[theme].background,
+                            },
+                            headerTitleStyle: {
+                                color: Colors[theme].text
+                            },
                             tabBarIcon: ({ color, focused }) => (
                                 <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
                             ),
@@ -39,6 +47,12 @@ export default function TabLayout() {
                         name="search"
                         options={{
                             title: 'Search',
+                            headerStyle: {
+                                backgroundColor: Colors[theme].background,
+                            },
+                            headerTitleStyle: {
+                                color: Colors[theme].text
+                            },
                             tabBarIcon: ({ color, focused }) => (
                                 <TabBarIcon name={focused ? 'search-circle' : 'search-circle-outline'} color={color} />
                             ),
@@ -47,8 +61,28 @@ export default function TabLayout() {
                         name="browse"
                         options={{
                             title: 'Browse',
+                            headerStyle: {
+                                backgroundColor: Colors[theme].background,
+                            },
+                            headerTitleStyle: {
+                                color: Colors[theme].text
+                            },
                             tabBarIcon: ({ color, focused }) => (
                                 <TabBarIcon name={focused ? 'menu-sharp' : 'menu-outline'} color={color} />
+                            ),
+                        }} />
+                    <Tabs.Screen
+                        name="theme-setting"
+                        options={{
+                            title: 'Setting',
+                            headerStyle: {
+                                backgroundColor: Colors[theme].background,
+                            },
+                            headerTitleStyle: {
+                                color: Colors[theme].text
+                            },
+                            tabBarIcon: ({ color, focused }) => (
+                                <TabBarIcon name={focused ? 'settings-sharp' : 'settings-outline'} color={color} />
                             ),
                         }} />
                 </Tabs>

@@ -55,14 +55,14 @@ const TodoItem = (props: TodoItemProps) => {
     };
 
     return (
-        <View className='flex min-h-16 max-h-24 w-full bg-white'>
+        <View className='flex min-h-16 max-h-24 w-full bg-background'>
             <View className='flex w-full h-full pl-3'>
                 <Pressable onPress={onPress} style={styles.container}>
                     <View className='flex flex-row w-full items-center'>
                         <Checkbox value={Boolean(item?.complete)} onChange={onToggle} color={item?.priorityItem?.color} />
 
                         <View className='flex-1'>
-                            <Text numberOfLines={2} className='text-lg'>{item?.title}</Text>
+                            <Text numberOfLines={2} className='text-lg text-foreground'>{item?.title}</Text>
                             {item?.description && (
                                 <Text numberOfLines={2} className='text-sm text-gray-500'>{item?.description}</Text>
                             )}

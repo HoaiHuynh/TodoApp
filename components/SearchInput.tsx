@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Pressable, StyleProp, StyleSheet, TextInput, View, ViewStyle } from 'react-native';
 import useDebounce from '@/hooks/useDebounce';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/themes/context';
+import { Colors } from '@/constants/Colors';
 
 interface SearchInputProps {
     placeholder?: string,
@@ -16,6 +18,7 @@ const SearchInput = (props: SearchInputProps) => {
         placeholder = 'Search',
     } = props;
 
+    const { theme } = useTheme();
     const [value, setValue] = useState('');
     const [isFocused, setIsFocused] = useState(false);
 
@@ -43,12 +46,12 @@ const SearchInput = (props: SearchInputProps) => {
 
     const renderIcon = () => {
         if (!value || !isFocused) {
-            return <Ionicons name='search' size={24} color='#000' style={{ position: 'absolute', right: 16, top: 8 }} />;
+            return <Ionicons name='search' size={24} color={Colors[theme].icon} style={{ position: 'absolute', right: 16, top: 8 }} />;
         }
 
         return (
             <Pressable style={styles.iconWrapper} onPress={onClear}>
-                <Ionicons name='close' size={24} color='#000' style={{ position: 'absolute', right: 16, top: 8 }} />
+                <Ionicons name='close' size={24} color={Colors[theme].icon} style={{ position: 'absolute', right: 16, top: 8 }} />
             </Pressable>
         );
     };
@@ -61,6 +64,7 @@ const SearchInput = (props: SearchInputProps) => {
                 onChangeText={onChangeText}
                 onFocus={onFocus}
                 onBlur={onBlur}
+                className='text-input'
                 style={[styles.input, props.style]} />
             {renderIcon()}
         </View>

@@ -5,35 +5,33 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: {
+				background: 'hsl(var(--background))',
+				foreground: 'hsl(var(--foreground))',
+				input: 'hsl(var(--input))',
 				primary: {
-					DEFAULT: 'var(--color-primary-default)',
-					light: 'var(--color-primary-light)',
+					DEFAULT: 'hsl(var(--primary))',
+					foreground: 'hsl(var(--primary-foreground))',
 				},
 				secondary: {
-					DEFAULT: 'var(--color-secondary-default)',
-					light: 'var(--color-secondary-light)',
+					DEFAULT: 'hsl(var(--secondary))',
+					foreground: 'hsl(var(--secondary-foreground))',
 				},
-				tertiary: {
-					DEFAULT: 'var(--color-tertiary-default)',
-					light: 'var(--color-tertiary-light)',
+				destructive: {
+					DEFAULT: 'hsl(var(--destructive))',
+					foreground: 'hsl(var(--destructive-foreground))',
 				},
 				accent: {
-					DEFAULT: 'var(--color-accent-default)',
-					light: 'var(--color-accent-light)',
+					DEFAULT: 'hsl(var(--accent))',
+					foreground: 'hsl(var(--accent-foreground))',
 				},
-				grey: {
-					DEFAULT: 'var(--color-grey-default)',
+				muted: {
+					DEFAULT: 'hsl(var(--muted))',
+					foreground: 'hsl(var(--muted-foreground))',
 				},
-				slate: {
-					DEFAULT: 'var(--color-slate-default)',
+				popover: {
+					DEFAULT: 'hsl(var(--popover))',
+					foreground: 'hsl(var(--popover-foreground))',
 				},
-				dark: {
-					DEFAULT: 'var(--color-dark-default)',
-				},
-				light: {
-					DEFAULT: 'var(--color-light-default)',
-				},
-				overlay: 'var(--color-overlay)',
 			},
 		},
 	},

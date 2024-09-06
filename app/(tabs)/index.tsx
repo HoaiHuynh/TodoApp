@@ -53,7 +53,7 @@ export default function HomeScreen() {
     };
 
     return (
-        <View className='flex flex-1'>
+        <View className='flex flex-1 bg-background'>
             <Stack.Screen options={{ headerLargeTitle: true, title: `Today, ${today}` }} />
 
             <Animated.FlatList

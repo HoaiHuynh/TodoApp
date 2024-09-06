@@ -5,6 +5,8 @@ import { labelOptions, priorityOptions } from '@/constants/AppConstants';
 import { useTodos } from '@/hooks/useTodoStore';
 import LabelPickerModal, { LabelPickerModalRef } from '@/components/label-picker/LabelPickerModal';
 import PriorityPickerModal, { PriorityPickerModalRef } from '@/components/priority-picker/PriorityPickerModal';
+import { useTheme } from '@/themes/context';
+import { Colors } from '@/constants/Colors';
 
 interface SettingItemProps {
     title: string;
@@ -15,12 +17,13 @@ interface SettingItemProps {
 }
 
 const SettingItem = (props: SettingItemProps) => {
+    const { theme } = useTheme();
     return (
         <Pressable onPress={props?.onPress} className='flex flex-row h-12 w-full items-center gap-x-2'>
-            <Ionicons name={props?.icon as any} color='#f87171' size={22} />
+            <Ionicons name={props?.icon as any} color={Colors[theme].tint} size={22} />
             <View className={`${!props?.disableLine && 'border-b border-b-neutral-300'} flex h-full flex-1 flex-row items-center`}>
-                <Text className='flex-1 text-xl'>{props.title}</Text>
-                <Text className='text-xl'>{props.value}</Text>
+                <Text className='flex-1 text-xl text-foreground'>{props.title}</Text>
+                <Text className='text-xl text-primary'>{props.value}</Text>
             </View>
         </Pressable>
     );
@@ -41,13 +44,13 @@ const Browse = () => {
     };
 
     return (
-        <View className='flex flex-1 px-4'>
+        <View className='flex flex-1 px-4 bg-background'>
             <ScrollView
                 style={{ flex: 1 }}
                 contentContainerStyle={{ flexGrow: 1 }}
                 showsVerticalScrollIndicator={false}>
 
-                <View className='bg-white p-4 rounded-2xl mt-4'>
+                <View className='bg- p-4 rounded-2xl mt-4'>
                     <SettingItem
                         title='Todos'
                         icon='albums-outline'
