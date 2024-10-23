@@ -24,6 +24,7 @@ const BaseForm = forwardRef<BaseFormRef, BaseFormProps>((props, ref) => {
         );
 
         return () => subscription.unsubscribe();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [methods?.watch]);
 
     useImperativeHandle(ref, () => ({
