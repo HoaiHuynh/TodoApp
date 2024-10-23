@@ -11,5 +11,5 @@ export interface FieldViewProps extends IFieldProps, IBaseFieldStyles {
      * @param props 
      * @returns 
      */
-    children: (props: FieldViewChildProps & any) => ReactNode | ReactElement | FC;
+    children: (props: FieldViewChildProps) => ReactNode | ReactElement | FC;
 }

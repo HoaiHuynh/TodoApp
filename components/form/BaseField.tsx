@@ -21,6 +21,7 @@ const BaseField = (props: IBaseFieldProps) => {
         rules,
         styleField,
         styleError,
+        ...restProps
     } = props;
 
     const [layout, setLayout] = useState<LayoutRectangle>();
@@ -74,14 +75,14 @@ const BaseField = (props: IBaseFieldProps) => {
      * @returns 
      */
     const renderContent = () => {
-        const currentProps: any = { ...props };
+        const currentProps: Partial<IBaseFieldProps> = { ...restProps };
 
-        delete currentProps.children;
-        delete currentProps.name;
-        delete currentProps.required;
-        delete currentProps.rules;
-        delete currentProps.styleError;
-        delete currentProps.styleField;
+        // delete currentProps.children;
+        // delete currentProps.name;
+        // delete currentProps.required;
+        // delete currentProps.rules;
+        // delete currentProps.styleError;
+        // delete currentProps.styleField;
         delete currentProps.onChange;
 
         return children && children({

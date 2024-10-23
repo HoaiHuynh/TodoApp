@@ -182,7 +182,6 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
                         {({ value, onChange }: FieldViewChildProps) => (
                             <PriorityPicker
                                 value={value}
-                                //@ts-ignore
                                 onChangePriority={onChange} />
                         )}
                     </FieldView>
@@ -199,7 +198,6 @@ const CreateUpdateTodoModal = forwardRef<CreateUpdateTodoModalRef, CreateUpdateT
                         {({ value, onChange }: FieldViewChildProps) => (
                             <SchedulePicker
                                 value={value}
-                                // @ts-ignore
                                 onChangeDate={onChange} />
                         )}
                     </FieldView>

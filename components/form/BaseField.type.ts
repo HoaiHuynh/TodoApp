@@ -10,7 +10,7 @@ export interface IBaseFieldStyles {
 
 export interface IBaseFieldChildProps {
     isError: boolean;
-    onChange: (value: string) => void;
+    onChange: (value: any) => void;
     onBlur: () => void;
     value: any;
     readOnly?: boolean;
